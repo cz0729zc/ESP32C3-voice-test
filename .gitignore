@@ -1,0 +1,15 @@
+# 忽略构建输出目录
+build
+
+# 忽略 CMake 生成的文件目录（如果在根目录下）
+CMakeFiles
+
+# 忽略 VS Code 配置目录
+.vscode
+
+# ESP-IDF 推荐忽略项
+sdkconfig
+sdkconfig.old
+dependencies.lock
+managed_components
+.clangd
