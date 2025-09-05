@@ -10,4 +10,4 @@ idf_component_register(SRCS "main.c"
                                  "app/include"
                                  "bsp/include"
                                  "service/include"
-                    REQUIRES unity espressif__mpu6050)
+                    REQUIRES unity driver esp_lcd espressif__esp_lvgl_port)
