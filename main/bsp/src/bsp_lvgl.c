@@ -26,7 +26,7 @@ esp_err_t app_lvgl_init(void)
     ESP_RETURN_ON_ERROR(lvgl_port_init(&lvgl_cfg), "BSP_LVGL", "LVGL port initialization failed");
 
     /* Add LCD screen */
-    const lvgl_port_display_cfg_t disp_cfg = {
+    const lvgl_port_display_cfg_t disp_cfg = { 
         .io_handle = lcd_io,
         .panel_handle = lcd_panel,
         .buffer_size = EXAMPLE_LCD_H_RES * EXAMPLE_LCD_DRAW_BUFF_HEIGHT,
@@ -54,3 +54,24 @@ esp_err_t app_lvgl_init(void)
 
     return ESP_OK;
 } 
+
+void bsp_lvgl_test_widgets(void)
+{
+    // 获取当前活动的屏幕
+    lv_obj_t *scr = lv_scr_act();
+
+    // 1. 创建一个标签 (Label)
+    lv_obj_t *label = lv_label_create(scr);
+    lv_label_set_text(label, "Hello, Nomi!");
+    lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 20); // 将标签居中对齐到屏幕顶部
+
+    // 2. 创建一个按钮 (Button)
+    lv_obj_t *btn = lv_btn_create(scr);
+    lv_obj_set_size(btn, 120, 50); // 设置按钮大小 
+    lv_obj_align(btn, LV_ALIGN_CENTER, 0, 0); // 将按钮居中对齐
+
+    // 3. 在按钮上创建一个标签
+    lv_obj_t *btn_label = lv_label_create(btn);
+    lv_label_set_text(btn_label, "Click Me");
+    lv_obj_center(btn_label); // 按钮内的标签居中
+}
