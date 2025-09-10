@@ -10,6 +10,6 @@ idf_component_register(SRCS "main.c"
                                  "app/include"
                                  "bsp/include"
                                  "service/include"
-                    REQUIRES unity driver esp_lcd espressif__esp_lvgl_port)
+                    REQUIRES unity driver esp_lcd espressif__esp_lvgl_port spiffs)
 
 # 添加此注释以尝试强制重新配置

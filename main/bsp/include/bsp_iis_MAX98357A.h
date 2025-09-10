@@ -9,11 +9,11 @@ extern "C" {
 #endif
 
 /* I2S GPIO Configuration */
-#define BSP_I2S_BCLK_PIN    (GPIO_NUM_39)
-#define BSP_I2S_WS_PIN      (GPIO_NUM_38)
-#define BSP_I2S_DOUT_PIN    (GPIO_NUM_11)
-#define BSP_I2S_SD_MODE_PIN (GPIO_NUM_9)
-#define BSP_I2S_GAIN_PIN    (GPIO_NUM_10)
+#define BSP_I2S_BCLK_PIN    (GPIO_NUM_3)
+#define BSP_I2S_WS_PIN      (GPIO_NUM_19)
+#define BSP_I2S_DOUT_PIN    (GPIO_NUM_0)
+#define BSP_I2S_SD_MODE_PIN (GPIO_NUM_2)
+#define BSP_I2S_GAIN_PIN    (GPIO_NUM_1)
 
 /**
  * @brief Set gain for MAX98357A
