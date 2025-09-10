@@ -25,21 +25,28 @@ esp_err_t app_spiffs_init(void)
       .base_path = "/spiffs",
       .partition_label = "storage",
       .max_files = 5,
-      .format_if_mount_failed = false
+      .format_if_mount_failed = false // We will handle formatting manually
     };
 
-    // Register SPIFFS filesystem
+    // First, try to mount the filesystem.
     esp_err_t ret = esp_vfs_spiffs_register(&conf);
 
-    if (ret != ESP_OK) {
-        if (ret == ESP_FAIL) {
-            ESP_LOGE(TAG, "Failed to mount or format filesystem");
-        } else if (ret == ESP_ERR_NOT_FOUND) {
-            ESP_LOGE(TAG, "Failed to find SPIFFS partition");
-        } else {
-            ESP_LOGE(TAG, "Failed to initialize SPIFFS (%s)", esp_err_to_name(ret));
+    if (ret == ESP_OK) {
+        ESP_LOGI(TAG, "SPIFFS mounted successfully.");
+    } else {
+        // If mounting fails, format the partition and try again.
+        ESP_LOGW(TAG, "Failed to mount SPIFFS (%s). Formatting partition...", esp_err_to_name(ret));
+        if (esp_spiffs_format(conf.partition_label) != ESP_OK) {
+            ESP_LOGE(TAG, "Failed to format SPIFFS partition '%s'.", conf.partition_label);
+            return ESP_FAIL;
         }
-        return ret;
+        ESP_LOGI(TAG, "Partition formatted. Trying to mount again.");
+        ret = esp_vfs_spiffs_register(&conf);
+        if (ret != ESP_OK) {
+            ESP_LOGE(TAG, "Failed to mount SPIFFS after formatting (%s).", esp_err_to_name(ret));
+            return ESP_FAIL;
+        }
+        ESP_LOGI(TAG, "SPIFFS mounted successfully after formatting.");
     }
 
     // Get and print partition info
