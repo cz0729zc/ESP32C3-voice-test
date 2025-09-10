@@ -91,6 +91,17 @@ esp_err_t audio_player_stop(void);
 esp_err_t audio_player_play_for(const int16_t *audio_data, size_t audio_data_len, uint32_t sample_rate, int duration_ms);
 
 /**
+ * @brief 创建音频播放后台任务
+ *
+ * @param stack_depth 任务堆栈大小
+ * @param priority 任务优先级
+ * @return
+ *      - ESP_OK: 成功
+ *      - ESP_ERR_NO_MEM: 内存不足
+ */
+esp_err_t audio_player_task_create(uint32_t stack_depth, UBaseType_t priority);
+
+/**
  * @brief 从SPIFFS播放WAV文件
  *
  * @param filepath WAV文件的完整路径 (e.g., "/spiffs/sound.wav")

@@ -61,9 +61,11 @@ esp_err_t bsp_iis_max98357a_init(uint32_t sample_rate)
     };
     ESP_RETURN_ON_ERROR(i2s_channel_init_std_mode(tx_chan, &tx_std_cfg), TAG, "Failed to init I2S channel");
 
-    /* Step 3: Enable the TX channel before writing data */
-    ESP_RETURN_ON_ERROR(i2s_channel_enable(tx_chan), TAG, "Failed to enable I2S channel");
+    /* Step 3: Try to fix the signal integrity issue by enabling internal pull-down on the DOUT pin. */
+    /* This is a software workaround. An external 10kΩ pull-down resistor is the recommended hardware solution. */
+    gpio_pulldown_en(BSP_I2S_DOUT_PIN);
 
+    /* Step 4: Channel is not enabled here, it will be enabled by the player task before writing data */
     return ESP_OK;
 }
 
@@ -100,10 +102,33 @@ esp_err_t bsp_iis_max98357a_deinit(void)
     gpio_reset_pin(BSP_I2S_SD_MODE_PIN);
     return ESP_OK;
 }
-esp_err_t bsp_iis_max98357a_stop(void)
+esp_err_t bsp_iis_max98357a_disable(void)
 {
     if (tx_chan) {
         return i2s_channel_disable(tx_chan);
     }
     return ESP_OK;
+}
+
+esp_err_t bsp_iis_max98357a_enable(void)
+{
+    if (tx_chan) {
+        return i2s_channel_enable(tx_chan);
+    }
+    return ESP_ERR_INVALID_STATE;
+}
+
+esp_err_t bsp_iis_max98357a_stop(void)
+{
+    return bsp_iis_max98357a_disable();
+}
+
+esp_err_t bsp_iis_max98357a_reconfig_clk(uint32_t sample_rate)
+{
+    if (tx_chan == NULL) {
+        return ESP_ERR_INVALID_STATE;
+    }
+    i2s_std_clk_config_t clk_cfg = I2S_STD_CLK_DEFAULT_CONFIG(sample_rate);
+    esp_err_t ret = i2s_channel_reconfig_std_clock(tx_chan, &clk_cfg);
+    return ret;
 }

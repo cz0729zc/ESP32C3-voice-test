@@ -10,7 +10,7 @@ extern "C" {
 
 /* I2S GPIO Configuration */
 #define BSP_I2S_BCLK_PIN    (GPIO_NUM_2)
-#define BSP_I2S_WS_PIN      (GPIO_NUM_21)
+#define BSP_I2S_WS_PIN      (GPIO_NUM_10)
 #define BSP_I2S_DOUT_PIN    (GPIO_NUM_0)
 #define BSP_I2S_SD_MODE_PIN (GPIO_NUM_3)
 #define BSP_I2S_GAIN_PIN    (GPIO_NUM_1)
@@ -58,7 +58,27 @@ esp_err_t bsp_iis_max98357a_write(const void *src, size_t data_size, size_t *byt
  */
 esp_err_t bsp_iis_max98357a_deinit(void);
 /**
- * @brief Stop I2S transmission
+ * @brief Reconfig I2S clock for a new sample rate
+ *
+ * @param[in] sample_rate New audio sample rate
+ * @return
+ *      - ESP_OK on success
+ *      - ESP_FAIL on error
+ */
+esp_err_t bsp_iis_max98357a_reconfig_clk(uint32_t sample_rate);
+
+/**
+ * @brief Disable I2S channel
+ */
+esp_err_t bsp_iis_max98357a_disable(void);
+
+/**
+ * @brief Enable I2S channel
+ */
+esp_err_t bsp_iis_max98357a_enable(void);
+
+/**
+ * @brief Stop I2S transmission (alias for disable)
  *
  * @return
  *      - ESP_OK on success

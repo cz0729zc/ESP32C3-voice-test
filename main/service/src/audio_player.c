@@ -1,19 +1,23 @@
 /**
  * @file audio_player.c
  * @brief 音频播放服务层实现
- * @version 0.1
- * @date 2025-08-01
+ * @version 0.2
+ * @date 2025-09-10
  *
  * @copyright Copyright (c) 2025
  *
  */
-#include "audio_player.h"
-#include "wav_parser.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/queue.h"
+#include "esp_log.h"
 #include <stdio.h>
 #include <errno.h>
 #include <sys/stat.h>
-#include "esp_log.h"
 #include <stdatomic.h>
+#include <string.h>
+#include "audio_player.h"
+#include "wav_parser.h"
 
 #ifdef CONFIG_AUDIO_PLAYER_ENABLE
 
@@ -21,6 +25,11 @@
 
 static const char *TAG = "AUDIO_PLAYER";
 #define WAV_BUFFER_SIZE 4096
+#define AUDIO_QUEUE_SIZE 5
+
+// FreeRTOS components
+static QueueHandle_t s_audio_queue = NULL;
+static TaskHandle_t s_audio_task_handle = NULL;
 
 // 软件音量（0-100），默认100%
 static atomic_uint_fast8_t s_volume_percent = 100;
@@ -55,7 +64,7 @@ esp_err_t audio_player_get_volume(uint8_t *percent)
  */
 esp_err_t audio_player_init(uint32_t sample_rate, uint8_t gain_db)
 {
-    ESP_LOGI(TAG, "Initializing audio player with sample rate: %lu, gain: %d dB", sample_rate, gain_db);
+    ESP_LOGI(TAG, "Initializing audio player with sample rate: %lu, gain: %d dB", (unsigned long)sample_rate, gain_db);
     esp_err_t ret = bsp_iis_max98357a_init(sample_rate);
     if (ret != ESP_OK) {
         return ret;
@@ -79,12 +88,10 @@ esp_err_t audio_player_play(const int16_t *data, size_t len)
     esp_err_t ret;
     if (vol >= 100) {
         // 直接写
-        ret = bsp_iis_max98357a_write(data, len, &bytes_written, 1000);
+        ret = bsp_iis_max98357a_write(data, len, &bytes_written, portMAX_DELAY);
     } else {
-        // 音量缩放：在栈/堆上开辟临时缓冲并缩放
-        // 注意：len 为字节数，必须为偶数
+        // 音量缩放
         size_t samples = len / sizeof(int16_t);
-        // 为避免大栈占用，这里用堆缓冲
         int16_t *tmp = (int16_t *)malloc(len);
         if (tmp == NULL) {
             ESP_LOGE(TAG, "No memory for volume scaling buffer");
@@ -93,14 +100,14 @@ esp_err_t audio_player_play(const int16_t *data, size_t len)
         for (size_t i = 0; i < samples; i++) {
             tmp[i] = audio_scale_sample(data[i], vol);
         }
-        ret = bsp_iis_max98357a_write(tmp, len, &bytes_written, 1000);
+        ret = bsp_iis_max98357a_write(tmp, len, &bytes_written, portMAX_DELAY);
         free(tmp);
     }
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Failed to write audio data, error: %d", ret);
     }
     if (bytes_written < len) {
-        ESP_LOGW(TAG, "Not all bytes were written. Total: %d, Written: %d", len, bytes_written);
+        ESP_LOGW(TAG, "Not all bytes were written. Total: %d, Written: %d", (int)len, (int)bytes_written);
     }
     return ret;
 }
@@ -120,8 +127,17 @@ esp_err_t audio_player_stop(void)
 esp_err_t audio_player_deinit(void)
 {
     ESP_LOGI(TAG, "Deinitializing audio player");
+    if (s_audio_task_handle) {
+        vTaskDelete(s_audio_task_handle);
+        s_audio_task_handle = NULL;
+    }
+    if (s_audio_queue) {
+        vQueueDelete(s_audio_queue);
+        s_audio_queue = NULL;
+    }
     return bsp_iis_max98357a_deinit();
 }
+
 /**
  * @brief 播放指定时长的音频
  */
@@ -131,89 +147,157 @@ esp_err_t audio_player_play_for(const int16_t *audio_data, size_t audio_data_len
         return ESP_ERR_INVALID_ARG;
     }
 
-    // 计算单段音频数据的播放时长 (毫秒)
-    // 由于数据是 int16_t (每个采样点2字节), 采样点数量为 audio_data_len / 2
     float single_play_duration_ms = ((float)audio_data_len / 2.0f / (float)sample_rate) * 1000.0f;
 
     if (single_play_duration_ms == 0) {
         return ESP_ERR_INVALID_ARG;
     }
 
-    // 计算需要循环播放的次数
     int loop_count = (int)((float)duration_ms / single_play_duration_ms);
     if (loop_count == 0) {
-        loop_count = 1; // 至少播放一次
+        loop_count = 1;
     }
 
     ESP_LOGI(TAG, "开始播放音频，持续时间: %d ms，循环次数: %d", duration_ms, loop_count);
 
-    // 循环播放音频数据
     for (int i = 0; i < loop_count; i++) {
         esp_err_t ret = audio_player_play(audio_data, audio_data_len);
         if (ret != ESP_OK) {
-            // 如果写入失败, 立即停止并返回错误
             audio_player_stop();
             return ret;
         }
     }
 
-    // 循环结束后停止播放
     return audio_player_stop();
+}
+
+static void _audio_player_task(void *pvParameters);
+
+esp_err_t audio_player_task_create(uint32_t stack_depth, UBaseType_t priority)
+{
+    if (s_audio_queue == NULL) {
+        s_audio_queue = xQueueCreate(AUDIO_QUEUE_SIZE, sizeof(char *));
+        if (s_audio_queue == NULL) {
+            ESP_LOGE(TAG, "Failed to create audio queue");
+            return ESP_ERR_NO_MEM;
+        }
+    }
+
+    if (s_audio_task_handle == NULL) {
+        BaseType_t ret = xTaskCreate(_audio_player_task, "AudioPlayerTask", stack_depth, NULL, priority, &s_audio_task_handle);
+        if (ret != pdPASS) {
+            ESP_LOGE(TAG, "Failed to create audio task");
+            return ESP_ERR_NO_MEM;
+        }
+    }
+    return ESP_OK;
 }
 
 esp_err_t audio_player_play_wav(const char *filepath)
 {
     if (filepath == NULL) {
-        ESP_LOGE(TAG, "Filepath is NULL");
         return ESP_ERR_INVALID_ARG;
     }
-
-    struct stat st;
-    if (stat(filepath, &st) != 0) {
-        ESP_LOGE(TAG, "stat failed, file not found: %s", filepath);
-    } else {
-        ESP_LOGI(TAG, "File exists: %s, size=%ld", filepath, (long)st.st_size);
+    if (s_audio_queue == NULL) {
+        ESP_LOGE(TAG, "Audio task not initialized. Call audio_player_task_create first.");
+        return ESP_ERR_INVALID_STATE;
     }
 
-    FILE *fp = fopen(filepath, "rb");
-    if (fp == NULL) {
-        ESP_LOGE(TAG, "Failed to open file: %s (errno=%d)", filepath, errno);
-        return ESP_ERR_NOT_FOUND;
-    }
-
-    wav_header_t wav_header;
-    if (wav_parser_parse_header(fp, &wav_header) != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to parse WAV header");
-        fclose(fp);
-        return ESP_FAIL;
-    }
-
-    // Re-initialize I2S with the sample rate from the WAV file
-    audio_player_deinit();
-    audio_player_init(wav_header.sample_rate, 15); // 默认15dB增益，音量用软件控制
-
-    int16_t *buffer = malloc(WAV_BUFFER_SIZE);
-    if (buffer == NULL) {
-        ESP_LOGE(TAG, "Failed to allocate memory for WAV buffer");
-        fclose(fp);
+    char *filepath_copy = strdup(filepath);
+    if (filepath_copy == NULL) {
+        ESP_LOGE(TAG, "Failed to allocate memory for filepath");
         return ESP_ERR_NO_MEM;
     }
 
-    size_t bytes_read;
-    do {
-        bytes_read = fread(buffer, 1, WAV_BUFFER_SIZE, fp);
-
-        if (bytes_read > 0) {
-            // audio_player_play 内部会根据软件音量进行缩放
-            audio_player_play(buffer, bytes_read);
-        }
-    } while (bytes_read > 0);
-
-    free(buffer);
-    fclose(fp);
-    audio_player_stop();
+    if (xQueueSend(s_audio_queue, &filepath_copy, pdMS_TO_TICKS(100)) != pdPASS) {
+        ESP_LOGW(TAG, "Failed to send to audio queue. Queue might be full.");
+        free(filepath_copy);
+        return ESP_FAIL;
+    }
 
     return ESP_OK;
+}
+
+static void _audio_player_task(void *pvParameters)
+{
+    char *filepath = NULL;
+    int16_t *buffer = malloc(WAV_BUFFER_SIZE);
+    if (buffer == NULL) {
+        ESP_LOGE(TAG, "Failed to allocate memory for WAV buffer in task, task aborting.");
+        vTaskDelete(NULL);
+        return;
+    }
+
+    ESP_LOGI(TAG, "Audio player task started.");
+
+    for (;;) {
+        if (xQueueReceive(s_audio_queue, &filepath, portMAX_DELAY) == pdPASS) {
+            if (filepath == NULL) continue;
+
+            ESP_LOGI(TAG, "Playing WAV from task: %s", filepath);
+
+            struct stat st;
+            if (stat(filepath, &st) != 0) {
+                ESP_LOGE(TAG, "stat failed, file not found: %s", filepath);
+                goto cleanup;
+            }
+
+            FILE *fp = fopen(filepath, "rb");
+            if (fp == NULL) {
+                ESP_LOGE(TAG, "Failed to open file: %s (errno=%d)", filepath, errno);
+                goto cleanup;
+            }
+
+            wav_header_t wav_header;
+            if (wav_parser_parse_header(fp, &wav_header) != ESP_OK) {
+                ESP_LOGE(TAG, "Failed to parse WAV header");
+                fclose(fp);
+                goto cleanup;
+            }
+
+            (void)bsp_iis_max98357a_disable(); // Disable before reconfiguring, ignore error if already disabled
+            if (bsp_iis_max98357a_reconfig_clk(wav_header.sample_rate) != ESP_OK) {
+                ESP_LOGE(TAG, "Failed to reconfig I2S clock");
+                fclose(fp);
+                goto cleanup;
+            }
+            bsp_iis_max98357a_set_gain(15);
+            bsp_iis_max98357a_enable(); // Enable before writing
+
+            size_t bytes_read;
+            do {
+                bytes_read = fread(buffer, 1, WAV_BUFFER_SIZE, fp);
+                if (bytes_read > 0) {
+                    if (wav_header.num_channels == 2) {
+                        // 立体声转单声道 (只取左声道)
+                        size_t mono_samples = bytes_read / 4; // 2 channels, 2 bytes per sample
+                        int16_t *mono_buffer = (int16_t *)malloc(mono_samples * sizeof(int16_t));
+                        if (mono_buffer) {
+                            for (size_t i = 0; i < mono_samples; i++) {
+                                mono_buffer[i] = buffer[i * 2];
+                            }
+                            audio_player_play(mono_buffer, mono_samples * sizeof(int16_t));
+                            free(mono_buffer);
+                        }
+                    } else {
+                        // 单声道直接播放
+                        audio_player_play(buffer, bytes_read);
+                    }
+                }
+            } while (bytes_read > 0);
+
+            (void)bsp_iis_max98357a_disable(); // Disable after playing, ignore error
+            fclose(fp);
+            ESP_LOGI(TAG, "Finished playing: %s", filepath);
+
+        cleanup:
+            free(filepath);
+            filepath = NULL;
+        }
+    }
+
+    free(buffer);
+    vTaskDelete(NULL);
 }
 
 #endif // CONFIG_AUDIO_PLAYER_ENABLE
