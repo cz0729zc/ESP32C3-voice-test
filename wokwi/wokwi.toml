@@ -1,4 +1,0 @@
-[wokwi]
-version = 1
-firmware = '../build/nomi.bin'
-elf = '../build/nomi.elf'
