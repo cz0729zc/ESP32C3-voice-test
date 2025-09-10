@@ -61,11 +61,7 @@ esp_err_t bsp_iis_max98357a_init(uint32_t sample_rate)
     };
     ESP_RETURN_ON_ERROR(i2s_channel_init_std_mode(tx_chan, &tx_std_cfg), TAG, "Failed to init I2S channel");
 
-    /* Step 3: Try to fix the signal integrity issue by enabling internal pull-down on the DOUT pin. */
-    /* This is a software workaround. An external 10kΩ pull-down resistor is the recommended hardware solution. */
-    gpio_pulldown_en(BSP_I2S_DOUT_PIN);
-
-    /* Step 4: Channel is not enabled here, it will be enabled by the player task before writing data */
+    /* Step 3: Channel is not enabled here, it will be enabled by the player task before writing data */
     return ESP_OK;
 }
 
