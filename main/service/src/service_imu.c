@@ -79,6 +79,9 @@ static void service_imu_task(void *pvParameters)
         // 填充需要上报的Z轴加速度数据
         s_imu_data.acce_z = acce.acce_z;
 
+        // 新增：填充需要上报的陀螺仪数据
+        s_imu_data.gyro = gyro;
+
         // 如果注册了回调函数，则调用它来上报完整数据
         if (s_data_cb) {
             s_data_cb(s_imu_data);

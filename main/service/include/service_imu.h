@@ -33,8 +33,9 @@ typedef struct {
  * @brief IMU上报给应用层的完整数据结构
  */
 typedef struct {
-    imu_angle_t angle; /*!< 姿态角 */
-    float acce_z;      /*!< Z轴加速度 (单位: g) */
+    imu_angle_t angle;      /*!< 姿态角 */
+    imu_gyro_value_t gyro;  /*!< 角速度 (新添加) */
+    float acce_z;           /*!< Z轴加速度 (单位: g) */
 } imu_data_t;
 
 /**

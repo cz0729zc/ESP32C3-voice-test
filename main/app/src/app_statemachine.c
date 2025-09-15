@@ -28,10 +28,16 @@ static void on_enter_state(app_state_t state) {
             // 进入左转状态，显示左转开始UI
             app_ui_show_turn_left_start();
             break;
+       case APP_STATE_TURN_LEFT_HARD:
+           app_ui_show_turn_left_hard();
+           break;
         case APP_STATE_TURN_RIGHT:
             // 进入右转状态，显示右转开始UI
             app_ui_show_turn_right_start();
             break;
+       case APP_STATE_TURN_RIGHT_HARD:
+           app_ui_show_turn_right_hard();
+           break;
         case APP_STATE_ACCELERATE:
             // 进入加速状态，显示加速开始UI
             app_ui_show_accelerate_start();
@@ -55,11 +61,13 @@ static void on_exit_state(app_state_t state) {
             xTimerStop(uniform_speed_ui_timer, portMAX_DELAY);
             break;
         case APP_STATE_TURN_LEFT:
+        case APP_STATE_TURN_LEFT_HARD:
             // 退出左转状态，显示结束UI，并短暂延时
             app_ui_show_turn_left_end();
             vTaskDelay(pdMS_TO_TICKS(1000));
             break;
         case APP_STATE_TURN_RIGHT:
+        case APP_STATE_TURN_RIGHT_HARD:
             // 退出右转状态，显示结束UI，并短暂延时
             app_ui_show_turn_right_end();
             vTaskDelay(pdMS_TO_TICKS(1000));
@@ -101,10 +109,14 @@ void app_statemachine_handle_event(app_event_t event) {
     switch (current_state) {
         case APP_STATE_UNIFORM_SPEED:
             // 在匀速状态下，根据不同的动作事件切换到对应状态
-            if (event == APP_EVENT_MOTION_TURN_LEFT) {
+            if (event == APP_EVENT_MOTION_TURN_LEFT_NORMAL) {
                 next_state = APP_STATE_TURN_LEFT;
-            } else if (event == APP_EVENT_MOTION_TURN_RIGHT) {
+            } else if (event == APP_EVENT_MOTION_TURN_LEFT_HARD) {
+               next_state = APP_STATE_TURN_LEFT_HARD;
+            } else if (event == APP_EVENT_MOTION_TURN_RIGHT_NORMAL) {
                 next_state = APP_STATE_TURN_RIGHT;
+            } else if (event == APP_EVENT_MOTION_TURN_RIGHT_HARD) {
+               next_state = APP_STATE_TURN_RIGHT_HARD;
             } else if (event == APP_EVENT_MOTION_ACCELERATE) {
                 next_state = APP_STATE_ACCELERATE;
             } else if (event == APP_EVENT_MOTION_BRAKE) {
@@ -116,7 +128,9 @@ void app_statemachine_handle_event(app_event_t event) {
             break;
 
         case APP_STATE_TURN_LEFT:
+        case APP_STATE_TURN_LEFT_HARD:
         case APP_STATE_TURN_RIGHT:
+        case APP_STATE_TURN_RIGHT_HARD:
         case APP_STATE_ACCELERATE:
         case APP_STATE_BRAKE:
             // 在任何一个动作状态下，接收到“动作结束”事件都会返回到匀速状态

@@ -20,9 +20,11 @@ void app_ui_show_uniform_speed(int index);
 // --- 左转状态 UI ---
 void app_ui_show_turn_left_start(void);
 void app_ui_show_turn_left_end(void);
+void app_ui_show_turn_left_hard(void);
 
 // --- 右转状态 UI (TODO) ---
 void app_ui_show_turn_right_start(void);
+void app_ui_show_turn_right_hard(void);
 void app_ui_show_turn_right_end(void);
 
 // --- 加速状态 UI (TODO) ---

@@ -1,7 +1,8 @@
 #include "app_motion.h"
 #include "service_imu.h"
 #include "esp_log.h"
-#include "app_events.h"
+#include "app_logic.h" // 改为包含 app_logic.h
+#include <math.h>
 
 static const char *TAG = "app_motion"; // 日志标签
 
@@ -16,6 +17,7 @@ typedef enum {
 #define TURN_START_THRESHOLD    30.0f // 进入“转向”状态的角度阈值
 #define TURN_STOP_THRESHOLD     15.0f // 从“转向”返回“直行”状态的角度阈值
 #define ACCELERATE_THRESHOLD_G  1.2f  // 判定为“加速”的Z轴加速度阈值 (单位: g)
+#define TURN_HARD_GYRO_THRESHOLD  100.0f // 判定为“大力转向”的角速度阈值 (dps)
 
 // 保存当前动作状态的静态变量
 static action_state_t s_current_action_state = ACTION_STATE_STRAIGHT;
@@ -55,24 +57,35 @@ static void imu_data_cb(imu_data_t data)
             break;
     }
 
-    // 如果状态发生变化，则发送事件通知UI层
+    // --- 事件发送逻辑 (简化版) ---
     if (last_state != s_current_action_state) {
-        switch (s_current_action_state) {
-            case ACTION_STATE_STRAIGHT:
-                xEventGroupSetBits(g_action_event_group, ACTION_EVENT_BIT_STRAIGHT);
-                break;
-            case ACTION_STATE_TURN_LEFT:
-                xEventGroupSetBits(g_action_event_group, ACTION_EVENT_BIT_LEFT);
-                break;
-            case ACTION_STATE_TURN_RIGHT:
-                xEventGroupSetBits(g_action_event_group, ACTION_EVENT_BIT_RIGHT);
-                break;
+        // 当状态刚从“直行”切换到“转向”时
+        if (last_state == ACTION_STATE_STRAIGHT) {
+            if (s_current_action_state == ACTION_STATE_TURN_LEFT) {
+                // 检查进入左转时的角速度
+                if (fabsf(data.gyro.gyro_y) > TURN_HARD_GYRO_THRESHOLD) {
+                    app_logic_post_event(APP_EVENT_MOTION_TURN_LEFT_HARD);
+                } else {
+                    app_logic_post_event(APP_EVENT_MOTION_TURN_LEFT_NORMAL);
+                }
+            } else if (s_current_action_state == ACTION_STATE_TURN_RIGHT) {
+                // 检查进入右转时的角速度
+                if (fabsf(data.gyro.gyro_y) > TURN_HARD_GYRO_THRESHOLD) {
+                    app_logic_post_event(APP_EVENT_MOTION_TURN_RIGHT_HARD);
+                } else {
+                    app_logic_post_event(APP_EVENT_MOTION_TURN_RIGHT_NORMAL);
+                }
+            }
+        }
+        // 当状态从“转向”切换回“直行”时
+        else if (s_current_action_state == ACTION_STATE_STRAIGHT) {
+            app_logic_post_event(APP_EVENT_MOTION_ENDED);
         }
     }
 
     // 加速检测是独立的，不影响转向状态
     if (data.acce_z > ACCELERATE_THRESHOLD_G) {
-        xEventGroupSetBits(g_action_event_group, ACTION_EVENT_BIT_ACCELERATE);
+        app_logic_post_event(APP_EVENT_MOTION_ACCELERATE);
     }
 }
 
@@ -107,8 +120,6 @@ esp_err_t app_motion_init(void)
 
     ESP_LOGI(TAG, "动作识别应用启动成功");
 
-    // 发送一个初始状态事件，确保UI有正确的初始状态
-    xEventGroupSetBits(g_action_event_group, ACTION_EVENT_BIT_STRAIGHT);
-
+    // 移除旧的初始事件发送，状态机有自己的初始化逻辑
     return ESP_OK;
 }

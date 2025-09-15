@@ -5,9 +5,11 @@
 
 // 定义应用的所有可能状态
 typedef enum {
-    APP_STATE_UNIFORM_SPEED, // 匀速状态
-    APP_STATE_TURN_LEFT,     // 左转状态
-    APP_STATE_TURN_RIGHT,    // 右转状态
+    APP_STATE_UNIFORM_SPEED,     // 匀速状态
+    APP_STATE_TURN_LEFT,         // 普通左转状态
+    APP_STATE_TURN_LEFT_HARD,    // 大力左转状态 (新)
+    APP_STATE_TURN_RIGHT,        // 普通右转状态
+    APP_STATE_TURN_RIGHT_HARD,   // 大力右转状态 (新)
     APP_STATE_ACCELERATE,    // 加速状态
     APP_STATE_BRAKE,         // 刹车状态 (TODO)
     APP_STATE_NUM_STATES     // 状态总数
@@ -15,8 +17,10 @@ typedef enum {
 
 // 定义驱动状态机迁移的事件
 typedef enum {
-    APP_EVENT_MOTION_TURN_LEFT,      // 动作：左转
-    APP_EVENT_MOTION_TURN_RIGHT,     // 动作：右转
+    APP_EVENT_MOTION_TURN_LEFT_NORMAL, // 动作：普通左转
+    APP_EVENT_MOTION_TURN_LEFT_HARD,   // 动作：大力左转 (新)
+    APP_EVENT_MOTION_TURN_RIGHT_NORMAL,// 动作：普通右转
+    APP_EVENT_MOTION_TURN_RIGHT_HARD,  // 动作：大力右转 (新)
     APP_EVENT_MOTION_ACCELERATE,     // 动作：加速
     APP_EVENT_MOTION_BRAKE,          // 动作：刹车 (TODO)
     APP_EVENT_MOTION_ENDED,          // 动作：结束

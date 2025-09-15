@@ -70,8 +70,10 @@ stateDiagram-v2
 // 定义应用的所有可能状态
 typedef enum {
     APP_STATE_UNIFORM_SPEED, // 匀速状态
-    APP_STATE_TURN_LEFT,     // 左转状态
-    APP_STATE_TURN_RIGHT,    // 右转状态
+    APP_STATE_TURN_LEFT,         // 普通左转状态
+    APP_STATE_TURN_LEFT_HARD,    // 大力左转状态 (新)
+    APP_STATE_TURN_RIGHT,        // 普通右转状态
+    APP_STATE_TURN_RIGHT_HARD,   // 大力右转状态 (新)
     APP_STATE_ACCELERATE,    // 加速状态
     APP_STATE_BRAKE,         // 刹车状态 (TODO)
     APP_STATE_NUM_STATES     // 状态总数
@@ -79,11 +81,16 @@ typedef enum {
 
 // 定义驱动状态机迁移的事件
 typedef enum {
-    APP_EVENT_MOTION_TURN_LEFT,      // 动作：左转
-    APP_EVENT_MOTION_TURN_RIGHT,     // 动作：右转
+    // --- 动作事件 ---
+    APP_EVENT_MOTION_TURN_LEFT_NORMAL, // 动作：普通左转
+    APP_EVENT_MOTION_TURN_LEFT_HARD,   // 动作：大力左转 (新)
+    APP_EVENT_MOTION_TURN_RIGHT_NORMAL,// 动作：普通右转
+    APP_EVENT_MOTION_TURN_RIGHT_HARD,  // 动作：大力右转 (新)
     APP_EVENT_MOTION_ACCELERATE,     // 动作：加速
     APP_EVENT_MOTION_BRAKE,          // 动作：刹车 (TODO)
     APP_EVENT_MOTION_ENDED,          // 动作：结束
+
+    // --- 系统事件 ---
     APP_EVENT_TIMER_UNIFORM_UI,      // 定时器：匀速UI切换
     APP_EVENT_NUM_EVENTS             // 事件总数
 } app_event_t;
@@ -299,6 +306,13 @@ void app_statemachine_handle_event(app_event_t event) {
 -   修改 `app_ui_init` 的职责，只做底层初始化。
 -   增加一系列新的函数声明，每个函数负责一个特定的UI场景。
 
+**代码规划 (用于 `apply_diff`)**:
+```c
+// 在 app_ui.h 中增加以下函数声明
+void app_ui_show_turn_left_hard(void); // 大力左转 (新)
+void app_ui_show_turn_right_hard(void); // 大力右转 (新)
+```
+
 ### 4.2. 重构 `main/app/src/app_ui.c`
 
 **目标**: 移除内部的任务和事件逻辑，实现新的UI显示函数。
@@ -307,6 +321,115 @@ void app_statemachine_handle_event(app_event_t event) {
 -   删除 `app_ui_task`。
 -   修改 `app_ui_init`，移除 `xTaskCreate`。
 -   实现所有 `app_ui_show_*` 函数，使用 `lv_label_set_text` 作为占位符。
+
+**代码规划 (用于 `apply_diff`)**:
+```c
+// 在 app_ui.c 中增加以下函数实现
+
+void app_ui_show_turn_left_hard(void)
+{
+    // TODO: 实现大力左转的“呼呼”UI
+    lv_label_set_text(status_label, "Turning Left HARD!");
+    ESP_LOGI(TAG, "UI 更新: 大力左转");
+}
+
+// ... 以及对应的右转版本
+```
+
+### 4.3. 动作识别升级 (`app_motion.c`)
+
+**目标**: 升级动作识别逻辑，使其能根据角速度和角度区分不同的转向力度。
+
+**前提**:
+- `service_imu` 层需要提供角速度数据。我们需要扩展 `imu_data_t` 结构体，增加 `imu_vec_t gyro;` 成员。
+
+**代码规划 (用于 `apply_diff`)**:
+
+**1. 添加新阈值定义**
+```c
+// 在 app_motion.c 的宏定义区添加
+#define TURN_HARD_GYRO_THRESHOLD  100.0f // 判定为“大力转向”的角速度阈值 (dps)
+```
+
+**2. 修改 `imu_data_cb` 状态机逻辑**
+```c
+// 重写 imu_data_cb 中的事件发送逻辑
+
+// ... (状态迁移逻辑保持不变) ...
+
+// --- 事件发送逻辑 (简化版) ---
+if (last_state != s_current_action_state) {
+    // 当状态刚从“直行”切换到“转向”时
+    if (last_state == ACTION_STATE_STRAIGHT) {
+        if (s_current_action_state == ACTION_STATE_TURN_LEFT) {
+            // 检查进入左转时的角速度
+            if (fabsf(data.gyro.y) > TURN_HARD_GYRO_THRESHOLD) {
+                app_logic_post_event(APP_EVENT_MOTION_TURN_LEFT_HARD);
+            } else {
+                app_logic_post_event(APP_EVENT_MOTION_TURN_LEFT_NORMAL);
+            }
+        }
+        // ... (对应的右转逻辑)
+    }
+    // 当状态从“转向”切换回“直行”时
+    else if (s_current_action_state == ACTION_STATE_STRAIGHT) {
+        app_logic_post_event(APP_EVENT_MOTION_ENDED);
+    }
+}
+```
+
+### 4.4. 状态机升级 (`app_statemachine.c`)
+
+**目标**: 升级状态机，使其能够处理新的转向事件，并进入对应的新状态。
+
+**代码规划 (用于 `apply_diff`)**:
+
+**1. 修改 `on_enter_state` 函数**
+```c
+// 在 on_enter_state 的 switch 中增加 case
+case APP_STATE_TURN_LEFT:
+    app_ui_show_turn_left_start();
+    break;
+case APP_STATE_TURN_LEFT_HARD:
+    app_ui_show_turn_left_hard();
+    break;
+// ... 对应的右转 case
+```
+
+**2. 修改 `on_exit_state` 函数**
+```c
+// 在 on_exit_state 的 switch 中，确保所有转向状态都能正确退出
+case APP_STATE_TURN_LEFT:
+case APP_STATE_TURN_LEFT_HARD:
+    app_ui_show_turn_left_end();
+    vTaskDelay(pdMS_TO_TICKS(1000)); // 短暂显示结束动画
+    break;
+// ... 对应的右转 case
+```
+
+**3. 修改 `app_statemachine_handle_event` 函数**
+```c
+// 重写 app_statemachine_handle_event 的状态处理逻辑
+switch (current_state) {
+    case APP_STATE_UNIFORM_SPEED:
+        if (event == APP_EVENT_MOTION_TURN_LEFT_NORMAL) {
+            next_state = APP_STATE_TURN_LEFT;
+        } else if (event == APP_EVENT_MOTION_TURN_LEFT_HARD) {
+            next_state = APP_STATE_TURN_LEFT_HARD;
+        }
+        // ... (对应的右转、加速、刹车逻辑)
+        break;
+
+    case APP_STATE_TURN_LEFT:
+    case APP_STATE_TURN_LEFT_HARD:
+        if (event == APP_EVENT_MOTION_ENDED) {
+            next_state = APP_STATE_UNIFORM_SPEED;
+        }
+        break;
+
+    // ... (对应的右转状态处理)
+}
+```
 
 ## 5. 系统集成
 

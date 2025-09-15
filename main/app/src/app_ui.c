@@ -86,3 +86,17 @@ void app_ui_show_brake_end(void)
     lv_label_set_text(status_label, "Brake Finished");
     ESP_LOGI(TAG, "UI 更新: 刹车结束");
 }
+
+void app_ui_show_turn_left_hard(void)
+{
+    // TODO: 实现大力左转的“呼呼”UI
+    lv_label_set_text(status_label, "Turning Left HARD!");
+    ESP_LOGI(TAG, "UI 更新: 大力左转");
+}
+
+void app_ui_show_turn_right_hard(void)
+{
+    // TODO: 实现大力右转的UI
+    lv_label_set_text(status_label, "Turning Right HARD!");
+    ESP_LOGI(TAG, "UI 更新: 大力右转");
+}

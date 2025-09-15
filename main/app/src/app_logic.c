@@ -33,6 +33,7 @@ static void app_logic_task(void *pvParameters)
 
 esp_err_t app_logic_init(void)
 {
+    ESP_LOGE(TAG, "========= NEW FIRMWARE IS RUNNING! app_logic_init() IS CALLED! =========");
     ESP_LOGI(TAG, "应用逻辑核心初始化");
 
     // 创建事件队列，用于任务间通信
