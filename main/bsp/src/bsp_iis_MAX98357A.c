@@ -61,6 +61,13 @@ esp_err_t bsp_iis_max98357a_init(uint32_t sample_rate)
     };
     ESP_RETURN_ON_ERROR(i2s_channel_init_std_mode(tx_chan, &tx_std_cfg), TAG, "Failed to init I2S channel");
 
+    /*
+     * Set the drive strength for the DOUT pin to the lowest level.
+     * This can help to reduce signal ringing on the data line, which might be the cause of the issue
+     * where audio only plays when a probe is attached.
+     */
+    gpio_set_drive_capability(BSP_I2S_DOUT_PIN, GPIO_DRIVE_CAP_0);
+
     /* Step 3: Channel is not enabled here, it will be enabled by the player task before writing data */
     return ESP_OK;
 }

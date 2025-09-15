@@ -11,7 +11,7 @@ extern "C" {
 /* I2S GPIO Configuration */
 #define BSP_I2S_BCLK_PIN    (GPIO_NUM_2)
 #define BSP_I2S_WS_PIN      (GPIO_NUM_10)
-#define BSP_I2S_DOUT_PIN    (GPIO_NUM_0)
+#define BSP_I2S_DOUT_PIN    (GPIO_NUM_5)
 #define BSP_I2S_SD_MODE_PIN (GPIO_NUM_3)
 #define BSP_I2S_GAIN_PIN    (GPIO_NUM_1)
 
