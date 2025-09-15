@@ -9,7 +9,8 @@
 			"*.c": "c",
 			"*.txt": "txt",
 			"esp_err.h": "c",
-			"bsp_lcd.h": "c"
+			"bsp_lcd.h": "c",
+			"robotlistening.h": "c"
 		}
 	}
 }
