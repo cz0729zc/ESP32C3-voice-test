@@ -2,7 +2,6 @@
 #include "esp_log.h"
 #include "lvgl.h"
 #include "app_lottie.h"
-#include "Lottie/RobotListening.h"
 #include "Lottie/angry.h"
 
 #include <stdio.h>
@@ -20,7 +19,7 @@ esp_err_t app_ui_init(void)
     lv_obj_set_style_bg_color(scr, lv_color_black(), 0);
     // 初始化Lottie模块并创建动画
     app_lottie_init();
-    app_lottie_create(scr, angry, 150, 150);
+    app_lottie_create(scr);
 
     // 创建一个状态标签，用于显示非动画状态
     status_label = lv_label_create(scr);
@@ -41,10 +40,11 @@ void app_ui_show_uniform_speed(int index)
 
 void app_ui_show_turn_left_start(void)
 {
-    // 显示Lottie动画
+    // 设置要播放的动画源并显示
+    app_lottie_set_src(angry, 150, 150);
     lv_obj_add_flag(status_label, LV_OBJ_FLAG_HIDDEN); // 隐藏状态标签
     app_lottie_show(true);
-    ESP_LOGI(TAG, "UI 更新: 左转开始 (Lottie)");
+    ESP_LOGI(TAG, "UI 更新: 左转开始 (angry Lottie)");
 }
 
 void app_ui_show_turn_left_end(void)
@@ -59,7 +59,9 @@ void app_ui_show_turn_left_end(void)
 void app_ui_show_turn_right_start(void)
 {
     // TODO: 实现右转开始的UI
-    lv_label_set_text(status_label, "Turning Right...");
+    app_lottie_set_src(angry, 150, 150);
+    lv_obj_add_flag(status_label, LV_OBJ_FLAG_HIDDEN); // 隐藏状态标签
+    app_lottie_show(true);
     ESP_LOGI(TAG, "UI 更新: 右转开始");
 }
 

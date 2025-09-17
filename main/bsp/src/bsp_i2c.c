@@ -14,9 +14,9 @@ esp_err_t bsp_i2c_init(i2c_port_t port, int sda_pin, int scl_pin, uint32_t clk_s
     i2c_config_t conf = {
         .mode = I2C_MODE_MASTER,             // 设置为I2C主模式
         .sda_io_num = sda_pin,               // SDA引脚
-        .sda_pullup_en = GPIO_PULLUP_ENABLE, // 使能SDA内部上拉电阻
+        .sda_pullup_en = GPIO_PULLUP_DISABLE, // 使能SDA内部上拉电阻
         .scl_io_num = scl_pin,               // SCL引脚
-        .scl_pullup_en = GPIO_PULLUP_ENABLE, // 使能SCL内部上拉电阻
+        .scl_pullup_en = GPIO_PULLUP_DISABLE, // 使能SCL内部上拉电阻
         .master.clk_speed = clk_speed,       // I2C时钟频率
         .clk_flags = 0,
     };

@@ -10,7 +10,15 @@
 			"*.txt": "txt",
 			"esp_err.h": "c",
 			"bsp_lcd.h": "c",
-			"robotlistening.h": "c"
+			"robotlistening.h": "c",
+			"bsp_mpu6050.h": "c",
+			"esp_log.h": "c",
+			"bsp_i2c.h": "c",
+			"i2c.h": "c",
+			"maren.h": "c",
+			"angry.h": "c",
+			"smile.h": "c",
+			"moneyface.h": "c"
 		}
 	}
 }

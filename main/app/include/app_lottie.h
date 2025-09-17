@@ -14,12 +14,17 @@ void app_lottie_init(void);
  * @brief 创建一个Lottie动画对象
  *
  * @param parent 父对象
+ */
+void app_lottie_create(lv_obj_t *parent);
+
+/**
+ * @brief 设置或切换Lottie动画的源数据
+ *
  * @param lottie_data Lottie JSON数据的指针 (C数组)
  * @param width 动画宽度
  * @param height 动画高度
- * @return esp_err_t
  */
-void app_lottie_create(lv_obj_t *parent, const char *lottie_data, lv_coord_t width, lv_coord_t height);
+void app_lottie_set_src(const char *lottie_data, lv_coord_t width, lv_coord_t height);
 
 /**
  * @brief 控制Lottie动画的显示或隐藏
