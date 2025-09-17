@@ -17,7 +17,7 @@ esp_err_t app_ui_init(void)
     ESP_LOGI(TAG, "UI 应用初始化");
 
     lv_obj_t *scr = lv_scr_act();
-
+    lv_obj_set_style_bg_color(scr, lv_color_black(), 0);
     // 初始化Lottie模块并创建动画
     app_lottie_init();
     app_lottie_create(scr, angry, 150, 150);
