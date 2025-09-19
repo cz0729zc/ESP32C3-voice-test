@@ -18,7 +18,9 @@
 			"maren.h": "c",
 			"angry.h": "c",
 			"smile.h": "c",
-			"moneyface.h": "c"
+			"moneyface.h": "c",
+			"audio_player.h": "c",
+			"app_init.h": "c"
 		}
 	}
 }

@@ -28,13 +28,13 @@
 #define EXAMPLE_LCD_GPIO_RST        (GPIO_NUM_3)
 #define EXAMPLE_LCD_GPIO_DC         (GPIO_NUM_5)
 #define EXAMPLE_LCD_GPIO_CS         (GPIO_NUM_7)
-#define EXAMPLE_LCD_GPIO_BL         (GPIO_NUM_21)
+#define EXAMPLE_LCD_GPIO_BL         (GPIO_NUM_0)
 
 static const char *TAG = "EXAMPLE";
 esp_lcd_panel_io_handle_t lcd_io = NULL;
 esp_lcd_panel_handle_t lcd_panel = NULL;
 
-esp_err_t app_lcd_init(void)
+esp_err_t app_lcd_init(void) 
 {
     esp_err_t ret = ESP_OK;
 

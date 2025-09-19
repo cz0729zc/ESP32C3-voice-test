@@ -3,6 +3,17 @@
 
 #include "esp_err.h"
 
+typedef enum {
+    UI_STATE_INIT,
+    UI_STATE_DRIVING,
+    UI_STATE_TURN_LEFT,
+    UI_STATE_TURN_LEFT_HARD,
+    UI_STATE_TURN_LEFT_END,
+    UI_STATE_TURN_RIGHT,
+    UI_STATE_TURN_RIGHT_HARD,
+    UI_STATE_TURN_RIGHT_END,
+} ui_state_t;
+
 /**
  * @brief 初始化UI底层驱动和LVGL库
  * @note 这个函数不再创建任务，只做UI的底层准备工作。

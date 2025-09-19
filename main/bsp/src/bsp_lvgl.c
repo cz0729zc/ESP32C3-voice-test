@@ -36,7 +36,6 @@ esp_err_t app_lvgl_init(void)
         .monochrome = false,
 #if LVGL_VERSION_MAJOR >= 9
         .color_format = LV_COLOR_FORMAT_RGB565,
-        //.color_format = LV_COLOR_FORMAT_ARGB8888,
 #endif
         .rotation = {
             .swap_xy = false,

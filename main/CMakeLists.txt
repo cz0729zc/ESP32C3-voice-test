@@ -13,4 +13,4 @@ idf_component_register(SRCS "main.c"
                                  "Lottie"
                     REQUIRES unity driver esp_lcd espressif__esp_lvgl_port spiffs)
 
-spiffs_create_partition_image(storage spiffs_data FLASH_IN_PROJECT FOLLOW_SYMLINKS)
+# spiffs_create_partition_image(storage spiffs_data FLASH_IN_PROJECT FOLLOW_SYMLINKS)
