@@ -9,12 +9,16 @@
 #include "esp_lvgl_port.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+
 // #include "maren.h"
 // #include "angry.h"
 // #include "smile.h"
 // #include "moneyface.h"
 // #include "happy.h"
 // #include "sad.h"
+#include "ui_custom/gui_guider.h"
+
+lv_ui guider_ui;
 
 void app_main(void)
 {
@@ -26,8 +30,8 @@ void app_main(void)
     // ESP_ERROR_CHECK(audio_player_task_create(4096, 5)); // 创建音频播放任务
 
     /* App层初始化 */
-    app_logic_init(); // 初始化应用核心逻辑，它将负责UI的初始化
-
+    //app_logic_init(); // 初始化应用核心逻辑，它将负责UI的初始化
+    setup_ui(&guider_ui);
 
     
     // bsp_lvgl_test_widgets();
