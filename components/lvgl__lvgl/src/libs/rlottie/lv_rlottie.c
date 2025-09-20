@@ -107,6 +107,42 @@ void lv_rlottie_set_current_frame(lv_obj_t * obj, const size_t goto_frame)
     rlottie->current_frame = goto_frame < rlottie->total_frames ? goto_frame : rlottie->total_frames - 1;
 }
 
+void lv_rlottie_replace_raw(lv_obj_t * obj, const char * rlottie_desc)
+{
+    lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
+    if (!rlottie) return;
+
+    // 1. 暂停并销毁旧资源
+    if (rlottie->task) {
+        lv_timer_pause(rlottie->task);
+    }
+    if (rlottie->animation) {
+        lottie_animation_destroy(rlottie->animation);
+        rlottie->animation = NULL;
+    }
+
+    // 2. 加载新动画数据
+    rlottie->animation = lottie_animation_from_data(rlottie_desc, rlottie_desc, "");
+    if (rlottie->animation == NULL) {
+        LV_LOG_ERROR("Failed to load new lottie data");
+        return;
+    }
+
+    // 3. 更新动画属性
+    rlottie->total_frames = lottie_animation_get_totalframe(rlottie->animation);
+    rlottie->framerate = (size_t)lottie_animation_get_framerate(rlottie->animation);
+    rlottie->current_frame = 0;
+
+    // 4. 更新并恢复定时器
+    if (rlottie->task) {
+        lv_timer_set_period(rlottie->task, 1000 / rlottie->framerate);
+        lv_timer_resume(rlottie->task);
+        lv_rlottie_set_current_frame(obj, 0); // 重置到第一帧
+    }
+    
+    lv_obj_invalidate(obj);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

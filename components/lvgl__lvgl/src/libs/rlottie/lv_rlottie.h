@@ -42,6 +42,14 @@ lv_obj_t * lv_rlottie_create_from_file(lv_obj_t * parent, int32_t width, int32_t
 lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, int32_t width, int32_t height,
                                       const char * rlottie_desc);
 
+/**
+ * Replace the animation data of an existing rlottie object.
+ * This is more memory efficient than deleting and creating a new object.
+ * @param obj pointer to a rlottie object
+ * @param rlottie_desc lottie animation data in JSON format
+ */
+void lv_rlottie_replace_raw(lv_obj_t * obj, const char * rlottie_desc);
+
 void lv_rlottie_set_play_mode(lv_obj_t * rlottie, const lv_rlottie_ctrl_t ctrl);
 void lv_rlottie_set_current_frame(lv_obj_t * rlottie, const size_t goto_frame);
 

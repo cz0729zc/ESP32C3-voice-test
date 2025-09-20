@@ -3,10 +3,8 @@
 #include "lvgl.h"
 #include "app_lottie.h"
 
-#include "angry.h"
 #include "smile.h"
-#include "moneyface.h"
-#include "happy.h"
+#include "danger.h"
 #include "sad.h"
 
 #include <stdio.h>
@@ -50,18 +48,18 @@ void app_ui_show_uniform_speed(int index)
 
 void app_ui_show_turn_left_start(void)
 {
-    // 左转开始，播放 angry 动画
-    app_lottie_set_src(angry, 150, 150);
+    // 左转开始，播放 danger 动画
+    app_lottie_set_src(danger, 150, 150);
     app_lottie_show(true);
-    ESP_LOGI(TAG, "UI 更新: 左转开始 (angry Lottie)");
+    ESP_LOGI(TAG, "UI 更新: 左转开始 (danger Lottie)");
 }
 
 void app_ui_show_turn_left_end(void)
 {
-    // 左转结束，播放 moneyface 作为过渡动画
-    app_lottie_set_src(moneyface, 150, 150);
+    // 左转结束，播放 sad 作为过渡动画
+    app_lottie_set_src(sad, 150, 150);
     app_lottie_show(true);
-    ESP_LOGI(TAG, "UI 更新: 左转结束 (moneyface Lottie)");
+    ESP_LOGI(TAG, "UI 更新: 左转结束 (sad Lottie)");
 }
 
 void app_ui_show_turn_right_start(void)
@@ -74,10 +72,10 @@ void app_ui_show_turn_right_start(void)
 
 void app_ui_show_turn_right_end(void)
 {
-    // 右转结束，播放 happy 作为过渡动画
-    app_lottie_set_src(happy, 150, 150);
+    // 右转结束，播放 danger 作为过渡动画
+    app_lottie_set_src(danger, 150, 150);
     app_lottie_show(true);
-    ESP_LOGI(TAG, "UI 更新: 右转结束 (happy Lottie)");
+    ESP_LOGI(TAG, "UI 更新: 右转结束 (danger Lottie)");
 }
 
 void app_ui_show_accelerate_start(void)
@@ -106,10 +104,10 @@ void app_ui_show_brake_end(void)
 
 void app_ui_show_turn_left_hard(void)
 {
-    // 大力左转，同样播放 angry 动画
-    app_lottie_set_src(angry, 150, 150);
+    // 大力左转，同样播放 danger 动画
+    app_lottie_set_src(danger, 150, 150);
     app_lottie_show(true);
-    ESP_LOGI(TAG, "UI 更新: 大力左转 (angry Lottie)");
+    ESP_LOGI(TAG, "UI 更新: 大力左转 (danger Lottie)");
 }
 
 void app_ui_show_turn_right_hard(void)
