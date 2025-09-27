@@ -43,19 +43,19 @@ void app_lottie_set_src(const char *lottie_data, lv_coord_t width, lv_coord_t he
     if (lvgl_port_lock(0)) {
         // 如果不存在动画对象，则创建一个
         if (lottie_anim == NULL) {
-            ESP_LOGI(TAG, "首次创建 Lottie 动画对象...");
+            ESP_LOGI(TAG, "首次创建 Lottie... | 当前剩余内存: %ld bytes", esp_get_free_heap_size());
             lottie_anim = lv_rlottie_create_from_raw(lottie_parent, width, height, lottie_data);
             if (lottie_anim) {
                 lv_obj_center(lottie_anim);
                 lv_obj_add_flag(lottie_anim, LV_OBJ_FLAG_HIDDEN);
-                ESP_LOGI(TAG, "Lottie 动画源设置成功");
+                ESP_LOGI(TAG, "首次创建成功 | 创建后剩余内存: %ld bytes", esp_get_free_heap_size());
             } else {
-                ESP_LOGE(TAG, "从新数据创建 Lottie 动画失败");
+                ESP_LOGE(TAG, "首次创建失败 | 剩余内存: %ld bytes", esp_get_free_heap_size());
             }
-        } else { // 如果已存在，则调用新函数高效替换动画
-            ESP_LOGI(TAG, "重用 Lottie 对象，正在设置新的动画源...");
+        } else { // 如果已存在，则调用 replace 函数
+            ESP_LOGI(TAG, "替换 Lottie... | 当前剩余内存: %ld bytes", esp_get_free_heap_size());
             lv_rlottie_replace_raw(lottie_anim, lottie_data);
-            ESP_LOGI(TAG, "Lottie 动画源更新成功");
+            ESP_LOGI(TAG, "替换完成 | 替换后剩余内存: %ld bytes", esp_get_free_heap_size());
         }
         lvgl_port_unlock();
     }
