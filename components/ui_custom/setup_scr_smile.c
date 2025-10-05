@@ -32,7 +32,7 @@ void setup_scr_smile(lv_ui *ui)
     ui->smile_animimg_1 = lv_animimg_create(ui->smile);
     lv_obj_set_pos(ui->smile_animimg_1, 70, 70);
     lv_obj_set_size(ui->smile_animimg_1, 100, 100);
-    lv_animimg_set_src(ui->smile_animimg_1, (const void **) smile_animimg_1_imgs, 60, false);
+    lv_animimg_set_src(ui->smile_animimg_1, (const void **) smile_animimg_1_imgs, 60);
     lv_animimg_set_duration(ui->smile_animimg_1, 30*60);
     lv_animimg_set_repeat_count(ui->smile_animimg_1, LV_ANIM_REPEAT_INFINITE);
     lv_animimg_start(ui->smile_animimg_1);

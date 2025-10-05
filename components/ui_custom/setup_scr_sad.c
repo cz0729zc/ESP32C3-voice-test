@@ -32,7 +32,7 @@ void setup_scr_sad(lv_ui *ui)
     ui->sad_animimg_1 = lv_animimg_create(ui->sad);
     lv_obj_set_pos(ui->sad_animimg_1, 70, 70);
     lv_obj_set_size(ui->sad_animimg_1, 100, 100);
-    lv_animimg_set_src(ui->sad_animimg_1, (const void **) sad_animimg_1_imgs, 50, false);
+    lv_animimg_set_src(ui->sad_animimg_1, (const void **) sad_animimg_1_imgs, 50);
     lv_animimg_set_duration(ui->sad_animimg_1, 30*50);
     lv_animimg_set_repeat_count(ui->sad_animimg_1, LV_ANIM_REPEAT_INFINITE);
     lv_animimg_start(ui->sad_animimg_1);

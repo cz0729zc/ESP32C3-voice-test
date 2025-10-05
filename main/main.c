@@ -10,12 +10,6 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-// #include "maren.h"
-// #include "angry.h"
-// #include "smile.h"
-// #include "moneyface.h"
-// #include "happy.h"
-// #include "sad.h"
 #include "ui_custom/gui_guider.h"
 
 lv_ui guider_ui;

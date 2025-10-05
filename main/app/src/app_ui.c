@@ -70,8 +70,8 @@ void app_ui_show_turn_right_start(void)
 void app_ui_show_turn_right_end(void)
 {
     // 右转结束，播放 danger 作为过渡动画
-    app_lottie_set_src(danger, 150, 150);
-    app_lottie_show(true);
+    // app_lottie_set_src(danger, 150, 150);
+    // app_lottie_show(true);
     ESP_LOGI(TAG, "UI 更新: 右转结束 (danger Lottie)");
 }
 
@@ -102,7 +102,7 @@ void app_ui_show_brake_end(void)
 void app_ui_show_turn_left_hard(void)
 {
     // 大力左转，同样播放 danger 动画
-    app_lottie_set_src(danger, 150, 150);
+    // app_lottie_set_src(danger, 150, 150);
     app_lottie_show(true);
     ESP_LOGI(TAG, "UI 更新: 大力左转 (danger Lottie)");
 }
@@ -110,7 +110,7 @@ void app_ui_show_turn_left_hard(void)
 void app_ui_show_turn_right_hard(void)
 {
     // 大力右转，同样播放 sad 动画
-    app_lottie_set_src(sad, 150, 150);
-    app_lottie_show(true);
+    // app_lottie_set_src(sad, 150, 150);
+    // app_lottie_show(true);
     ESP_LOGI(TAG, "UI 更新: 大力右转 (sad Lottie)");
 }
