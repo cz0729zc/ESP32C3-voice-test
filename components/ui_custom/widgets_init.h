@@ -24,6 +24,9 @@ void digital_clock_count(int * hour, int * minute, int * seconds, char * meridie
 #endif
 
 
+extern const lv_image_dsc_t * smile_animimg_1_imgs[60];
+extern const lv_image_dsc_t * sad_animimg_1_imgs[50];
+extern const lv_image_dsc_t * danger_animimg_1_imgs[90];
 
 
 #ifdef __cplusplus

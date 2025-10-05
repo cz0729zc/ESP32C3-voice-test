@@ -3,9 +3,6 @@
 #include "lvgl.h"
 #include "app_lottie.h"
 
-#include "smile.h"
-#include "danger.h"
-#include "sad.h"
 
 #include <stdio.h>
 
@@ -31,8 +28,8 @@ esp_err_t app_ui_init(void)
     lv_obj_add_flag(status_label, LV_OBJ_FLAG_HIDDEN); // 默认隐藏
 
     // 默认播放 smile 动画
-    app_lottie_set_src(smile, 150, 150);
-    app_lottie_show(true);
+    // app_lottie_set_src(smile, 150, 150);
+    // app_lottie_show(true);
     ESP_LOGI(TAG, "UI 初始化完成，默认播放 smile");
 
     return ESP_OK;
@@ -41,32 +38,32 @@ esp_err_t app_ui_init(void)
 void app_ui_show_uniform_speed(int index)
 {
     // 匀速/直行状态，播放 smile 动画
-    app_lottie_set_src(smile, 150, 150);
-    app_lottie_show(true);
+    // app_lottie_set_src(smile, 150, 150);
+    // app_lottie_show(true);
     ESP_LOGI(TAG, "UI 更新: 匀速/直行 (smile Lottie)");
 }
 
 void app_ui_show_turn_left_start(void)
 {
     // 左转开始，播放 danger 动画
-    app_lottie_set_src(danger, 150, 150);
-    app_lottie_show(true);
+    // app_lottie_set_src(danger, 150, 150);
+    // app_lottie_show(true);
     ESP_LOGI(TAG, "UI 更新: 左转开始 (danger Lottie)");
 }
 
 void app_ui_show_turn_left_end(void)
 {
     // 左转结束，播放 sad 作为过渡动画
-    app_lottie_set_src(sad, 150, 150);
-    app_lottie_show(true);
+    // app_lottie_set_src(sad, 150, 150);
+    // app_lottie_show(true);
     ESP_LOGI(TAG, "UI 更新: 左转结束 (sad Lottie)");
 }
 
 void app_ui_show_turn_right_start(void)
 {
     // 右转开始，播放 sad 动画
-    app_lottie_set_src(sad, 150, 150);
-    app_lottie_show(true);
+    // app_lottie_set_src(sad, 150, 150);
+    // app_lottie_show(true);
     ESP_LOGI(TAG, "UI 更新: 右转开始 (sad Lottie)");
 }
 
