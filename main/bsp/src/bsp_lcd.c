@@ -23,12 +23,19 @@
 #define EXAMPLE_LCD_DRAW_BUFF_DOUBLE (1)
 #define EXAMPLE_LCD_DRAW_BUFF_HEIGHT (50)
 #define EXAMPLE_LCD_BL_ON_LEVEL     (BSP_LCD_BL_ON_LEVEL)
-#define EXAMPLE_LCD_GPIO_SCLK       (GPIO_NUM_4)
-#define EXAMPLE_LCD_GPIO_MOSI       (GPIO_NUM_6)
-#define EXAMPLE_LCD_GPIO_RST        (GPIO_NUM_3)
-#define EXAMPLE_LCD_GPIO_DC         (GPIO_NUM_5)
-#define EXAMPLE_LCD_GPIO_CS         (GPIO_NUM_7)
-#define EXAMPLE_LCD_GPIO_BL         (GPIO_NUM_0)
+// #define EXAMPLE_LCD_GPIO_SCLK       (GPIO_NUM_4)
+// #define EXAMPLE_LCD_GPIO_MOSI       (GPIO_NUM_6)
+// #define EXAMPLE_LCD_GPIO_RST        (GPIO_NUM_3)
+// #define EXAMPLE_LCD_GPIO_DC         (GPIO_NUM_5)
+// #define EXAMPLE_LCD_GPIO_CS         (GPIO_NUM_7)
+// #define EXAMPLE_LCD_GPIO_BL         (GPIO_NUM_0)
+#define EXAMPLE_LCD_GPIO_SCLK       (GPIO_NUM_11)
+#define EXAMPLE_LCD_GPIO_MOSI       (GPIO_NUM_12)
+#define EXAMPLE_LCD_GPIO_RST        (GPIO_NUM_13)
+#define EXAMPLE_LCD_GPIO_DC         (GPIO_NUM_9)
+#define EXAMPLE_LCD_GPIO_CS         (GPIO_NUM_10)
+#define EXAMPLE_LCD_GPIO_BL         (GPIO_NUM_14)
+
 
 static const char *TAG = "EXAMPLE";
 esp_lcd_panel_io_handle_t lcd_io = NULL;

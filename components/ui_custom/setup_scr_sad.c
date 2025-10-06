@@ -16,6 +16,11 @@
 
 
 
+static void sad_timer_cb(lv_timer_t *timer)
+{
+    ui_load_scr_animation(&guider_ui, &guider_ui.danger, guider_ui.danger_del, &guider_ui.sad_del, setup_scr_danger, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, true, true);
+}
+
 void setup_scr_sad(lv_ui *ui)
 {
     //Write codes sad
@@ -39,6 +44,9 @@ void setup_scr_sad(lv_ui *ui)
 
     //The custom code of sad.
 
+
+    lv_timer_t *timer = lv_timer_create(sad_timer_cb, 5000, NULL);
+    lv_timer_set_repeat_count(timer, 1);
 
     //Update current screen layout.
     lv_obj_update_layout(ui->sad);

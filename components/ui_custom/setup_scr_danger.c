@@ -13,45 +13,13 @@
 #include "events_init.h"
 #include "widgets_init.h"
 #include "custom.h"
-#include "esp_log.h"
 
 
-// typedef enum {
-//     SCREEN_STATE_DANGER,
-//     SCREEN_STATE_SAD,
-//     SCREEN_STATE_SMILE,
-// } screen_state_t;
 
-// static screen_state_t current_screen_state = SCREEN_STATE_DANGER;
-// static lv_timer_t *screen_switch_timer = NULL;
-
-// static const char *TAG = "SCREEN";
-
-// static void screen_switch_timer_cb(lv_timer_t *timer)
-// {
-//     lv_ui *ui = (lv_ui *)lv_timer_get_user_data(timer);
-
-//     switch (current_screen_state) {
-//         case SCREEN_STATE_DANGER:
-//             // Switch to sad screen
-//             ESP_LOGI(TAG,"Switching to SAD screen\n");
-//             ui_load_scr_animation(ui, &ui->sad, ui->sad_del, &ui->danger_del, setup_scr_sad, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, true, true);
-//             current_screen_state = SCREEN_STATE_SAD;
-//             break;
-//         case SCREEN_STATE_SAD:
-//             // Switch to smile screen
-//             ESP_LOGI(TAG,"Switching to SMILE screen\n");
-//             ui_load_scr_animation(ui, &ui->smile, ui->smile_del, &ui->sad_del, setup_scr_smile, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, true, true);
-//             current_screen_state = SCREEN_STATE_SMILE;
-//             break;
-//         case SCREEN_STATE_SMILE:
-//             // Switch back to danger screen
-//             ESP_LOGI(TAG,"Switching to DANGER screen\n");
-//             ui_load_scr_animation(ui, &ui->danger, ui->danger_del, &ui->smile_del, setup_scr_danger, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, true, true);
-//             current_screen_state = SCREEN_STATE_DANGER;
-//             break;
-//     }
-// }
+static void danger_timer_cb(lv_timer_t *timer)
+{
+    ui_load_scr_animation(&guider_ui, &guider_ui.smile, guider_ui.smile_del, &guider_ui.danger_del, setup_scr_smile, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, true, true);
+}
 
 void setup_scr_danger(lv_ui *ui)
 {
@@ -74,10 +42,11 @@ void setup_scr_danger(lv_ui *ui)
     lv_animimg_set_repeat_count(ui->danger_animimg_1, LV_ANIM_REPEAT_INFINITE);
     lv_animimg_start(ui->danger_animimg_1);
 
-    // //The custom code of danger.
-    // if (screen_switch_timer == NULL) {
-    //     screen_switch_timer = lv_timer_create(screen_switch_timer_cb, 5000, ui);
-    // }
+    //The custom code of danger.
+
+
+    lv_timer_t *timer = lv_timer_create(danger_timer_cb, 5000, NULL);
+    lv_timer_set_repeat_count(timer, 1);
 
     //Update current screen layout.
     lv_obj_update_layout(ui->danger);

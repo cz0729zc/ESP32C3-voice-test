@@ -87,8 +87,8 @@ void setup_ui(lv_ui *ui)
     setup_bottom_layer();
     init_scr_del_flag(ui);
     init_keyboard(ui);
-    setup_scr_danger(ui);
-    lv_screen_load(ui->danger);
+    setup_scr_smile(ui);
+    lv_screen_load(ui->smile);
 }
 
 void video_play(lv_ui *ui)
