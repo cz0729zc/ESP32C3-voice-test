@@ -14,8 +14,6 @@
 #include "widgets_init.h"
 #include "custom.h"
 
-
-
 static void danger_timer_cb(lv_timer_t *timer)
 {
     ui_load_scr_animation(&guider_ui, &guider_ui.smile, guider_ui.smile_del, &guider_ui.danger_del, setup_scr_smile, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, true, true);
@@ -37,14 +35,12 @@ void setup_scr_danger(lv_ui *ui)
     ui->danger_animimg_1 = lv_animimg_create(ui->danger);
     lv_obj_set_pos(ui->danger_animimg_1, 70, 70);
     lv_obj_set_size(ui->danger_animimg_1, 100, 100);
-    lv_animimg_set_src(ui->danger_animimg_1, (const void **) danger_animimg_1_imgs, 90);
-    lv_animimg_set_duration(ui->danger_animimg_1, 30*90);
+    lv_animimg_set_src(ui->danger_animimg_1, (const void **) danger_animimg_1_imgs, 36);
+    lv_animimg_set_duration(ui->danger_animimg_1, 30*36);
     lv_animimg_set_repeat_count(ui->danger_animimg_1, LV_ANIM_REPEAT_INFINITE);
     lv_animimg_start(ui->danger_animimg_1);
 
     //The custom code of danger.
-
-
     lv_timer_t *timer = lv_timer_create(danger_timer_cb, 5000, NULL);
     lv_timer_set_repeat_count(timer, 1);
 

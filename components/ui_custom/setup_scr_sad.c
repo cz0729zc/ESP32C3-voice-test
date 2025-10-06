@@ -14,8 +14,6 @@
 #include "widgets_init.h"
 #include "custom.h"
 
-
-
 static void sad_timer_cb(lv_timer_t *timer)
 {
     ui_load_scr_animation(&guider_ui, &guider_ui.danger, guider_ui.danger_del, &guider_ui.sad_del, setup_scr_danger, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, true, true);
@@ -37,14 +35,12 @@ void setup_scr_sad(lv_ui *ui)
     ui->sad_animimg_1 = lv_animimg_create(ui->sad);
     lv_obj_set_pos(ui->sad_animimg_1, 70, 70);
     lv_obj_set_size(ui->sad_animimg_1, 100, 100);
-    lv_animimg_set_src(ui->sad_animimg_1, (const void **) sad_animimg_1_imgs, 50);
-    lv_animimg_set_duration(ui->sad_animimg_1, 30*50);
+    lv_animimg_set_src(ui->sad_animimg_1, (const void **) sad_animimg_1_imgs, 45);
+    lv_animimg_set_duration(ui->sad_animimg_1, 30*45);
     lv_animimg_set_repeat_count(ui->sad_animimg_1, LV_ANIM_REPEAT_INFINITE);
     lv_animimg_start(ui->sad_animimg_1);
 
     //The custom code of sad.
-
-
     lv_timer_t *timer = lv_timer_create(sad_timer_cb, 5000, NULL);
     lv_timer_set_repeat_count(timer, 1);
 

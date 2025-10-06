@@ -14,11 +14,9 @@
 #include "widgets_init.h"
 #include "custom.h"
 
-
-
 static void smile_timer_cb(lv_timer_t *timer)
 {
-    ui_load_scr_animation(&guider_ui, &guider_ui.sad, guider_ui.sad_del, &guider_ui.smile_del, setup_scr_sad, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, true, true);
+    ui_load_scr_animation(&guider_ui, &guider_ui.sad, guider_ui.sad_del, &guider_ui.danger_del, setup_scr_sad, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, true, true);
 }
 
 void setup_scr_smile(lv_ui *ui)
@@ -43,8 +41,6 @@ void setup_scr_smile(lv_ui *ui)
     lv_animimg_start(ui->smile_animimg_1);
 
     //The custom code of smile.
-
-
     lv_timer_t *timer = lv_timer_create(smile_timer_cb, 5000, NULL);
     lv_timer_set_repeat_count(timer, 1);
 
