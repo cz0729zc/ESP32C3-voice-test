@@ -110,6 +110,11 @@ esp_err_t app_ui_init(void)
     ESP_LOGI(TAG, "UI Init Finished, default screen is set by setup_ui (DANGER).");
     ESP_LOGI(TAG, "Initial memory: %d bytes", (size_t)esp_get_free_heap_size());
 
+    // Create a timer to cycle through screens for testing
+    void ui_test_timer_cb(lv_timer_t *timer);
+    lv_timer_create(ui_test_timer_cb, 5000, NULL);
+    ESP_LOGI(TAG, "UI test timer created, will switch screens every 5 seconds.");
+
     return ESP_OK;
 }
 
@@ -177,4 +182,32 @@ void app_ui_show_turn_right_hard(void)
 {
     ESP_LOGI(TAG, "UI Update: Hard Turn Right -> SAD");
     switch_to_screen(SCREEN_ID_SAD);
+}
+
+// Timer callback for automated UI testing
+void ui_test_timer_cb(lv_timer_t *timer)
+{
+    static int next_screen_index = 0;
+    screen_id_t screens_to_cycle[] = {SCREEN_ID_SMILE, SCREEN_ID_SAD, SCREEN_ID_DANGER};
+    
+    screen_id_t next_screen = screens_to_cycle[next_screen_index];
+    
+    ESP_LOGI(TAG, "[Test Timer] Switching to screen index %d", next_screen_index);
+    
+    // Manually call the corresponding function to trigger the switch
+    switch(next_screen) {
+        case SCREEN_ID_SMILE:
+            app_ui_show_uniform_speed(0);
+            break;
+        case SCREEN_ID_SAD:
+            app_ui_show_turn_left_end();
+            break;
+        case SCREEN_ID_DANGER:
+            app_ui_show_turn_left_start();
+            break;
+        default:
+            break;
+    }
+
+    next_screen_index = (next_screen_index + 1) % (sizeof(screens_to_cycle) / sizeof(screen_id_t));
 }
