@@ -190,6 +190,10 @@ void ui_test_timer_cb(lv_timer_t *timer)
     static int next_screen_index = 0;
     screen_id_t screens_to_cycle[] = {SCREEN_ID_SMILE, SCREEN_ID_SAD, SCREEN_ID_DANGER};
     
+    // Log memory usage *before* the switch.
+    // At this point (5s after the last switch), the previous screen's resources should have been fully released.
+    ESP_LOGI(TAG, "[Test Timer] Memory before next switch: %zu bytes", (size_t)esp_get_free_heap_size());
+
     screen_id_t next_screen = screens_to_cycle[next_screen_index];
     
     ESP_LOGI(TAG, "[Test Timer] Switching to screen index %d", next_screen_index);
