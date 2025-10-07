@@ -2,6 +2,7 @@
 #include "esp_log.h"
 #include "esp_system.h"
 #include "lvgl.h"
+#include "esp_lvgl_port.h"
 
 #include "ui_custom/gui_guider.h"
 #include "ui_custom/events_init.h"
@@ -42,52 +43,58 @@ static bool* get_current_screen_del_flag(void)
 // Generic screen switching function
 static void switch_to_screen(screen_id_t screen_id)
 {
-    if (g_current_screen == screen_id) {
-        ESP_LOGI(TAG, "Already on the target screen, skipping switch.");
-        return;
-    }
-
-    ESP_LOGI(TAG, "Memory before switch: %zu bytes", (size_t)esp_get_free_heap_size());
-
-    bool *old_scr_del = get_current_screen_del_flag();
-    lv_obj_t **new_scr = NULL;
-    ui_setup_scr_t setup_scr = NULL;
-    const char *scr_name = "UNKNOWN";
-    bool new_scr_del_val = false;
-
-    switch (screen_id) {
-        case SCREEN_ID_SMILE:
-            new_scr = &guider_ui.smile;
-            setup_scr = setup_scr_smile;
-            new_scr_del_val = guider_ui.smile_del;
-            scr_name = "SMILE";
-            break;
-        case SCREEN_ID_SAD:
-            new_scr = &guider_ui.sad;
-            setup_scr = setup_scr_sad;
-            new_scr_del_val = guider_ui.sad_del;
-            scr_name = "SAD";
-            break;
-        case SCREEN_ID_DANGER:
-            new_scr = &guider_ui.danger;
-            setup_scr = setup_scr_danger;
-            new_scr_del_val = guider_ui.danger_del;
-            scr_name = "DANGER";
-            break;
-        default:
-            ESP_LOGE(TAG, "Invalid screen ID: %d", screen_id);
-            // Restore memory log on failure
-            ESP_LOGI(TAG, "Memory after failed switch attempt: %zu bytes", (size_t)esp_get_free_heap_size());
+    if (lvgl_port_lock(0)) {
+        if (g_current_screen == screen_id) {
+            ESP_LOGI(TAG, "Already on the target screen, skipping switch.");
+            lvgl_port_unlock();
             return;
+        }
+
+        ESP_LOGI(TAG, "Memory before switch: %zu bytes", (size_t)esp_get_free_heap_size());
+
+        bool *old_scr_del = get_current_screen_del_flag();
+        lv_obj_t **new_scr = NULL;
+        ui_setup_scr_t setup_scr = NULL;
+        const char *scr_name = "UNKNOWN";
+        bool new_scr_del_val = false;
+
+        switch (screen_id) {
+            case SCREEN_ID_SMILE:
+                new_scr = &guider_ui.smile;
+                setup_scr = setup_scr_smile;
+                new_scr_del_val = guider_ui.smile_del;
+                scr_name = "SMILE";
+                break;
+            case SCREEN_ID_SAD:
+                new_scr = &guider_ui.sad;
+                setup_scr = setup_scr_sad;
+                new_scr_del_val = guider_ui.sad_del;
+                scr_name = "SAD";
+                break;
+            case SCREEN_ID_DANGER:
+                new_scr = &guider_ui.danger;
+                setup_scr = setup_scr_danger;
+                new_scr_del_val = guider_ui.danger_del;
+                scr_name = "DANGER";
+                break;
+            default:
+                ESP_LOGE(TAG, "Invalid screen ID: %d", screen_id);
+                // Restore memory log on failure
+                ESP_LOGI(TAG, "Memory after failed switch attempt: %zu bytes", (size_t)esp_get_free_heap_size());
+                lvgl_port_unlock();
+                return;
+        }
+
+        ESP_LOGI(TAG, "Switching from screen %d to %s screen", g_current_screen, scr_name);
+
+        ui_load_scr_animation(&guider_ui, new_scr, new_scr_del_val, old_scr_del, setup_scr, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, true, true);
+
+        g_current_screen = screen_id;
+
+        ESP_LOGI(TAG, "Memory after switch: %zu bytes", (size_t)esp_get_free_heap_size());
+        
+        lvgl_port_unlock();
     }
-
-    ESP_LOGI(TAG, "Switching from screen %d to %s screen", g_current_screen, scr_name);
-
-    ui_load_scr_animation(&guider_ui, new_scr, new_scr_del_val, old_scr_del, setup_scr, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, true, true);
-
-    g_current_screen = screen_id;
-
-    ESP_LOGI(TAG, "Memory after switch: %zu bytes", (size_t)esp_get_free_heap_size());
 }
 
 
