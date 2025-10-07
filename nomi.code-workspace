@@ -22,7 +22,10 @@
 			"audio_player.h": "c",
 			"app_init.h": "c",
 			"rlottie_capi.h": "c",
-			"danger.h": "c"
+			"danger.h": "c",
+			"stdio.h": "c",
+			"gui_guider.h": "c",
+			"events_init.h": "c"
 		}
 	}
 }
