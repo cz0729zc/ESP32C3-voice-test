@@ -19,7 +19,7 @@ typedef enum {
     SCREEN_ID_DANGER,
 } screen_id_t;
 
-static screen_id_t g_current_screen = SCREEN_ID_NONE;
+static screen_id_t g_current_screen = SCREEN_ID_DANGER; // Default screen set by setup_ui
 
 // Helper to get the delete flag pointer for the current screen
 static bool* get_current_screen_del_flag(void)
@@ -95,14 +95,13 @@ esp_err_t app_ui_init(void)
 {
     ESP_LOGI(TAG, "UI Application Init");
 
+    // setup_ui already handles the creation and loading of the initial screen (danger).
+    // It also calls init_scr_del_flag.
     setup_ui(&guider_ui);
-    events_init(&guider_ui);
-    init_scr_del_flag(&guider_ui);
+    events_init(&guider_ui); // events_init is currently empty but keep it for future use.
 
-    // Set initial screen to smile
-    switch_to_screen(SCREEN_ID_SMILE);
-
-    ESP_LOGI(TAG, "UI Init Finished, default screen: SMILE");
+    ESP_LOGI(TAG, "UI Init Finished, default screen is set by setup_ui (DANGER).");
+    ESP_LOGI(TAG, "Initial memory: %d bytes", (size_t)esp_get_free_heap_size());
 
     return ESP_OK;
 }
