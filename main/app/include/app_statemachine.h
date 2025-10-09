@@ -11,7 +11,7 @@ typedef enum {
     APP_STATE_TURN_RIGHT,        // 普通右转状态
     APP_STATE_TURN_RIGHT_HARD,   // 大力右转状态 (新)
     APP_STATE_ACCELERATE,    // 加速状态
-    APP_STATE_BRAKE,         // 刹车状态 (TODO)
+    APP_STATE_DECELERATE,         // 减速
     APP_STATE_NUM_STATES     // 状态总数
 } app_state_t;
 
@@ -22,7 +22,7 @@ typedef enum {
     APP_EVENT_MOTION_TURN_RIGHT_NORMAL,// 动作：普通右转
     APP_EVENT_MOTION_TURN_RIGHT_HARD,  // 动作：大力右转 (新)
     APP_EVENT_MOTION_ACCELERATE,     // 动作：加速
-    APP_EVENT_MOTION_BRAKE,          // 动作：刹车 (TODO)
+    APP_EVENT_MOTION_DECELERATE,     // 动作：减速
     APP_EVENT_MOTION_ENDED,          // 动作：结束
     APP_EVENT_TIMER_UNIFORM_UI,      // 定时器：匀速UI切换
     APP_EVENT_NUM_EVENTS             // 事件总数

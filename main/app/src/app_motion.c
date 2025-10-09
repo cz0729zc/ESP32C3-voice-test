@@ -2,6 +2,7 @@
 #include "service_imu.h"
 #include "esp_log.h"
 #include "app_logic.h" // 改为包含 app_logic.h
+#include "app_statemachine.h"
 #include <math.h>
 
 static const char *TAG = "app_motion"; // 日志标签
@@ -17,6 +18,7 @@ typedef enum {
 #define TURN_START_THRESHOLD    30.0f // 进入“转向”状态的角度阈值
 #define TURN_STOP_THRESHOLD     15.0f // 从“转向”返回“直行”状态的角度阈值
 #define ACCELERATE_THRESHOLD_G  1.2f  // 判定为“加速”的Z轴加速度阈值 (单位: g)
+#define DECELERATE_THRESHOLD_G  0.8f  // 判定为“减速”的Z轴加速度阈值 (单位: g)
 #define TURN_HARD_GYRO_THRESHOLD  100.0f // 判定为“大力转向”的角速度阈值 (dps)
 
 // 保存当前动作状态的静态变量
@@ -86,6 +88,8 @@ static void imu_data_cb(imu_data_t data)
     // 加速检测是独立的，不影响转向状态
     if (data.acce_z > ACCELERATE_THRESHOLD_G) {
         app_logic_post_event(APP_EVENT_MOTION_ACCELERATE);
+    } else if (data.acce_z < DECELERATE_THRESHOLD_G) {
+        app_logic_post_event(APP_EVENT_MOTION_DECELERATE);
     }
 }
 

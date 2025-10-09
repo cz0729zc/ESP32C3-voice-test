@@ -42,9 +42,9 @@ static void on_enter_state(app_state_t state) {
             // 进入加速状态，显示加速开始UI
             app_ui_show_accelerate_start();
             break;
-        case APP_STATE_BRAKE:
-            // 进入刹车状态，显示刹车开始UI
-            app_ui_show_brake_start();
+        case APP_STATE_DECELERATE:
+            // 进入减速状态，显示减速开始UI
+            app_ui_show_decelerate_start();
             break;
         default:
             // 未知状态，不执行任何操作
@@ -77,9 +77,9 @@ static void on_exit_state(app_state_t state) {
             app_ui_show_accelerate_end();
             vTaskDelay(pdMS_TO_TICKS(1000));
             break;
-        case APP_STATE_BRAKE:
-            // 退出刹车状态，显示结束UI，并短暂延时
-            app_ui_show_brake_end();
+        case APP_STATE_DECELERATE:
+            // 退出减速状态，显示结束UI，并短暂延时
+            app_ui_show_decelerate_end();
             vTaskDelay(pdMS_TO_TICKS(1000));
             break;
         default:
@@ -119,8 +119,8 @@ void app_statemachine_handle_event(app_event_t event) {
                next_state = APP_STATE_TURN_RIGHT_HARD;
             } else if (event == APP_EVENT_MOTION_ACCELERATE) {
                 next_state = APP_STATE_ACCELERATE;
-            } else if (event == APP_EVENT_MOTION_BRAKE) {
-                next_state = APP_STATE_BRAKE;
+            } else if (event == APP_EVENT_MOTION_DECELERATE) {
+                next_state = APP_STATE_DECELERATE;
             } else if (event == APP_EVENT_TIMER_UNIFORM_UI) {
                 // 定时器事件触发，仅切换UI，不改变状态
                 app_ui_show_uniform_speed(rand() % 10);
@@ -132,7 +132,7 @@ void app_statemachine_handle_event(app_event_t event) {
         case APP_STATE_TURN_RIGHT:
         case APP_STATE_TURN_RIGHT_HARD:
         case APP_STATE_ACCELERATE:
-        case APP_STATE_BRAKE:
+        case APP_STATE_DECELERATE:
             // 在任何一个动作状态下，接收到“动作结束”事件都会返回到匀速状态
             if (event == APP_EVENT_MOTION_ENDED) {
                 next_state = APP_STATE_UNIFORM_SPEED;

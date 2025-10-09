@@ -43,7 +43,7 @@ void app_ui_show_accelerate_start(void);
 void app_ui_show_accelerate_end(void);
 
 // --- 刹车状态 UI (TODO) ---
-void app_ui_show_brake_start(void);
-void app_ui_show_brake_end(void);
+void app_ui_show_decelerate_start(void);
+void app_ui_show_decelerate_end(void);
 
 #endif /* APP_UI_H_ */

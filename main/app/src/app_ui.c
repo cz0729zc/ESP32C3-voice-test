@@ -160,13 +160,13 @@ void app_ui_show_accelerate_end(void)
     ESP_LOGI(TAG, "UI Update: Accelerate End (Not Implemented)");
 }
 
-void app_ui_show_brake_start(void)
+void app_ui_show_decelerate_start(void)
 {
     // TODO: Implement UI for brake start
     ESP_LOGI(TAG, "UI Update: Brake Start (Not Implemented)");
 }
 
-void app_ui_show_brake_end(void)
+void app_ui_show_decelerate_end(void)
 {
     // TODO: Implement UI for brake end
     ESP_LOGI(TAG, "UI Update: Brake End (Not Implemented)");
