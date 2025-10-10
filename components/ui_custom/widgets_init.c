@@ -136,6 +136,7 @@ const lv_image_dsc_t * E_2_animimg_1_imgs[40] = {
     &E_2_animimg_1surprise20_38,
     &E_2_animimg_1surprise20_39,
 };
+/*
 const lv_image_dsc_t * E_5_animimg_1_imgs[40] = {
     &E_5_animimg_1starface20_0,
     &E_5_animimg_1starface20_01,
@@ -178,6 +179,8 @@ const lv_image_dsc_t * E_5_animimg_1_imgs[40] = {
     &E_5_animimg_1starface20_38,
     &E_5_animimg_1starface20_39,
 };
+*/
+/*
 const lv_image_dsc_t * E_7_animimg_1_imgs[40] = {
     &E_7_animimg_1glasseswhite20_0,
     &E_7_animimg_1glasseswhite20_01,
@@ -220,6 +223,7 @@ const lv_image_dsc_t * E_7_animimg_1_imgs[40] = {
     &E_7_animimg_1glasseswhite20_38,
     &E_7_animimg_1glasseswhite20_39,
 };
+*/
 const lv_image_dsc_t * E_8_animimg_1_imgs[60] = {
     &E_8_animimg_1faint20_0,
     &E_8_animimg_1faint20_01,

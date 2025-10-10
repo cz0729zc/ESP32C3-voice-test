@@ -17,8 +17,8 @@ static const char *TAG = "app_ui";
 typedef enum {
     SCREEN_ID_NONE,
     SCREEN_ID_E2,
-    SCREEN_ID_E5,
-    SCREEN_ID_E7,
+    // SCREEN_ID_E5,
+    // SCREEN_ID_E7,
     SCREEN_ID_E8,
     SCREEN_ID_E10,
     SCREEN_ID_E13,
@@ -35,8 +35,8 @@ static bool* get_current_screen_del_flag(void)
 {
     switch (g_current_screen) {
         case SCREEN_ID_E2: return &guider_ui.E_2_del;
-        case SCREEN_ID_E5: return &guider_ui.E_5_del;
-        case SCREEN_ID_E7: return &guider_ui.E_7_del;
+        // case SCREEN_ID_E5: return &guider_ui.E_5_del;
+        // case SCREEN_ID_E7: return &guider_ui.E_7_del;
         case SCREEN_ID_E8: return &guider_ui.E_8_del;
         case SCREEN_ID_E10: return &guider_ui.E_10_del;
         case SCREEN_ID_E13: return &guider_ui.E_13_del;
@@ -70,8 +70,8 @@ static void switch_to_screen(screen_id_t screen_id)
 
         switch (screen_id) {
             case SCREEN_ID_E2: new_scr = &guider_ui.E_2; setup_scr = setup_scr_E_2; new_scr_del_val = guider_ui.E_2_del; scr_name = "E2"; break;
-            case SCREEN_ID_E5: new_scr = &guider_ui.E_5; setup_scr = setup_scr_E_5; new_scr_del_val = guider_ui.E_5_del; scr_name = "E5"; break;
-            case SCREEN_ID_E7: new_scr = &guider_ui.E_7; setup_scr = setup_scr_E_7; new_scr_del_val = guider_ui.E_7_del; scr_name = "E7"; break;
+            // case SCREEN_ID_E5: new_scr = &guider_ui.E_5; setup_scr = setup_scr_E_5; new_scr_del_val = guider_ui.E_5_del; scr_name = "E5"; break;
+            // case SCREEN_ID_E7: new_scr = &guider_ui.E_7; setup_scr = setup_scr_E_7; new_scr_del_val = guider_ui.E_7_del; scr_name = "E7"; break;
             case SCREEN_ID_E8: new_scr = &guider_ui.E_8; setup_scr = setup_scr_E_8; new_scr_del_val = guider_ui.E_8_del; scr_name = "E8"; break;
             case SCREEN_ID_E10: new_scr = &guider_ui.E_10; setup_scr = setup_scr_E_10; new_scr_del_val = guider_ui.E_10_del; scr_name = "E10"; break;
             case SCREEN_ID_E13: new_scr = &guider_ui.E_13; setup_scr = setup_scr_E_13; new_scr_del_val = guider_ui.E_13_del; scr_name = "E13"; break;
@@ -106,9 +106,9 @@ esp_err_t app_ui_init(void)
     setup_ui(&guider_ui);
     events_init(&guider_ui);
 
-    g_current_screen = SCREEN_ID_E5;
+    g_current_screen = SCREEN_ID_E14; // Change default to E14
 
-    ESP_LOGI(TAG, "UI Init Finished, default screen is E5.");
+    ESP_LOGI(TAG, "UI Init Finished, default screen is E14.");
     ESP_LOGI(TAG, "Initial memory: %d bytes", (size_t)esp_get_free_heap_size());
 
     return ESP_OK;
@@ -116,29 +116,15 @@ esp_err_t app_ui_init(void)
 
 void app_ui_show_uniform_speed(int index)
 {
-    ESP_LOGI(TAG, "UI Update: Uniform Speed -> E5");
-    switch_to_screen(SCREEN_ID_E5);
+    ESP_LOGI(TAG, "UI Update: Uniform Speed -> E14");
+    switch_to_screen(SCREEN_ID_E14); // Change to E14
 }
 
 void app_ui_show_accelerate_start(void)
 {
-    int rand_val = esp_random() % 3;
-    screen_id_t screen_to_show;
-    switch (rand_val) {
-        case 0:
-            screen_to_show = SCREEN_ID_E10;
-            ESP_LOGI(TAG, "UI Update: Accelerate Start -> E10");
-            break;
-        case 1:
-            screen_to_show = SCREEN_ID_E7;
-            ESP_LOGI(TAG, "UI Update: Accelerate Start -> E7");
-            break;
-        default:
-            screen_to_show = SCREEN_ID_E5;
-            ESP_LOGI(TAG, "UI Update: Accelerate Start -> E5");
-            break;
-    }
-    switch_to_screen(screen_to_show);
+    // With E5 and E7 gone, only E10 is left. No need for random.
+    ESP_LOGI(TAG, "UI Update: Accelerate Start -> E10");
+    switch_to_screen(SCREEN_ID_E10);
 }
 
 void app_ui_show_accelerate_end(void)
@@ -174,7 +160,7 @@ void app_ui_show_turn_left_end(void)
 void app_ui_show_turn_right_start(void)
 {
     ESP_LOGI(TAG, "UI Update: Turn Right Start -> E17");
-    // switch_to_screen(SCREEN_ID_E17);
+    switch_to_screen(SCREEN_ID_E17);
 }
 
 void app_ui_show_turn_right_end(void)

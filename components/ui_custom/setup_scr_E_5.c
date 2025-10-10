@@ -18,29 +18,29 @@
 
 void setup_scr_E_5(lv_ui *ui)
 {
-    //Write codes E_5
-    ui->E_5 = lv_obj_create(NULL);
-    lv_obj_set_size(ui->E_5, 240, 240);
-    lv_obj_set_scrollbar_mode(ui->E_5, LV_SCROLLBAR_MODE_OFF);
+    // //Write codes E_5
+    // ui->E_5 = lv_obj_create(NULL);
+    // lv_obj_set_size(ui->E_5, 240, 240);
+    // lv_obj_set_scrollbar_mode(ui->E_5, LV_SCROLLBAR_MODE_OFF);
 
-    //Write style for E_5, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_bg_opa(ui->E_5, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->E_5, lv_color_hex(0x050000), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_dir(ui->E_5, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
+    // //Write style for E_5, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    // lv_obj_set_style_bg_opa(ui->E_5, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    // lv_obj_set_style_bg_color(ui->E_5, lv_color_hex(0x050000), LV_PART_MAIN|LV_STATE_DEFAULT);
+    // lv_obj_set_style_bg_grad_dir(ui->E_5, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
 
-    //Write codes E_5_animimg_1
-    ui->E_5_animimg_1 = lv_animimg_create(ui->E_5);
-    lv_obj_set_pos(ui->E_5_animimg_1, 45, 45);
-    lv_obj_set_size(ui->E_5_animimg_1, 150, 150);
-    lv_animimg_set_src(ui->E_5_animimg_1, (const void **) E_5_animimg_1_imgs, 40);
-    lv_animimg_set_duration(ui->E_5_animimg_1, 30*40);
-    lv_animimg_set_repeat_count(ui->E_5_animimg_1, LV_ANIM_REPEAT_INFINITE);
-    lv_animimg_start(ui->E_5_animimg_1);
+    // //Write codes E_5_animimg_1
+    // ui->E_5_animimg_1 = lv_animimg_create(ui->E_5);
+    // lv_obj_set_pos(ui->E_5_animimg_1, 45, 45);
+    // lv_obj_set_size(ui->E_5_animimg_1, 150, 150);
+    // lv_animimg_set_src(ui->E_5_animimg_1, (const void **) E_5_animimg_1_imgs, 40);
+    // lv_animimg_set_duration(ui->E_5_animimg_1, 30*40);
+    // lv_animimg_set_repeat_count(ui->E_5_animimg_1, LV_ANIM_REPEAT_INFINITE);
+    // lv_animimg_start(ui->E_5_animimg_1);
 
-    //The custom code of E_5.
+    // //The custom code of E_5.
 
 
-    //Update current screen layout.
-    lv_obj_update_layout(ui->E_5);
+    // //Update current screen layout.
+    // lv_obj_update_layout(ui->E_5);
 
 }
