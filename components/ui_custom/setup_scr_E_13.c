@@ -32,7 +32,7 @@ void setup_scr_E_13(lv_ui *ui)
     ui->E_13_animimg_1 = lv_animimg_create(ui->E_13);
     lv_obj_set_pos(ui->E_13_animimg_1, 45, 45);
     lv_obj_set_size(ui->E_13_animimg_1, 150, 150);
-    lv_animimg_set_src(ui->E_13_animimg_1, (const void **) E_13_animimg_1_imgs, 40, false);
+    lv_animimg_set_src(ui->E_13_animimg_1, (const void **) E_13_animimg_1_imgs, 40);
     lv_animimg_set_duration(ui->E_13_animimg_1, 30*40);
     lv_animimg_set_repeat_count(ui->E_13_animimg_1, LV_ANIM_REPEAT_INFINITE);
     lv_image_set_src(ui->E_13_animimg_1, E_13_animimg_1_imgs[0]);
