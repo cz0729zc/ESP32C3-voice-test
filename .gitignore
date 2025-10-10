@@ -8,8 +8,6 @@ CMakeFiles
 .vscode
 
 # ESP-IDF 推荐忽略项
-sdkconfig
-sdkconfig.old
 dependencies.lock
 managed_components
 .clangd
