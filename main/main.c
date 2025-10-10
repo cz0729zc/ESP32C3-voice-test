@@ -24,8 +24,8 @@ void app_main(void)
     // ESP_ERROR_CHECK(audio_player_task_create(4096, 5)); // 创建音频播放任务
 
     /* App层初始化 */
-    // app_logic_init(); // 初始化应用核心逻辑，它将负责UI的初始化
-    setup_ui(&guider_ui); 
+    app_logic_init(); // 初始化应用核心逻辑，它将负责UI的初始化
+    // setup_ui(&guider_ui); 
 
     
     // bsp_lvgl_test_widgets();

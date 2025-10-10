@@ -174,7 +174,7 @@ void app_ui_show_turn_left_end(void)
 void app_ui_show_turn_right_start(void)
 {
     ESP_LOGI(TAG, "UI Update: Turn Right Start -> E17");
-    switch_to_screen(SCREEN_ID_E17);
+    // switch_to_screen(SCREEN_ID_E17);
 }
 
 void app_ui_show_turn_right_end(void)

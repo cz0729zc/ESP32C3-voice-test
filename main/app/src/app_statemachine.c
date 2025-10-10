@@ -29,14 +29,14 @@ static void on_enter_state(app_state_t state) {
             app_ui_show_turn_left_start();
             break;
        case APP_STATE_TURN_LEFT_HARD:
-           app_ui_show_turn_left_hard();
+        //    app_ui_show_turn_left_hard();
            break;
         case APP_STATE_TURN_RIGHT:
             // 进入右转状态，显示右转开始UI
             app_ui_show_turn_right_start();
             break;
        case APP_STATE_TURN_RIGHT_HARD:
-           app_ui_show_turn_right_hard();
+        //    app_ui_show_turn_right_hard();
            break;
         case APP_STATE_ACCELERATE:
             // 进入加速状态，显示加速开始UI
