@@ -3,6 +3,7 @@
 #include "esp_system.h"
 #include "lvgl.h"
 #include "esp_lvgl_port.h"
+#include "esp_random.h"
 
 #include "ui_custom/gui_guider.h"
 #include "ui_custom/events_init.h"
@@ -15,26 +16,35 @@ static const char *TAG = "app_ui";
 // Enum to track the current screen
 typedef enum {
     SCREEN_ID_NONE,
-    SCREEN_ID_SMILE,
-    SCREEN_ID_SAD,
-    SCREEN_ID_DANGER,
+    SCREEN_ID_E2,
+    SCREEN_ID_E5,
+    SCREEN_ID_E7,
+    SCREEN_ID_E8,
+    SCREEN_ID_E10,
+    SCREEN_ID_E13,
+    SCREEN_ID_E14,
+    SCREEN_ID_E15,
+    SCREEN_ID_E16,
+    SCREEN_ID_E17,
 } screen_id_t;
 
-static screen_id_t g_current_screen = SCREEN_ID_DANGER; // Default screen set by setup_ui
+static screen_id_t g_current_screen = SCREEN_ID_NONE; // Default screen set by setup_ui
 
 // Helper to get the delete flag pointer for the current screen
 static bool* get_current_screen_del_flag(void)
 {
     switch (g_current_screen) {
-        case SCREEN_ID_SMILE:
-            return &guider_ui.smile_del;
-        case SCREEN_ID_SAD:
-            return &guider_ui.sad_del;
-        case SCREEN_ID_DANGER:
-            return &guider_ui.danger_del;
+        case SCREEN_ID_E2: return &guider_ui.E_2_del;
+        case SCREEN_ID_E5: return &guider_ui.E_5_del;
+        case SCREEN_ID_E7: return &guider_ui.E_7_del;
+        case SCREEN_ID_E8: return &guider_ui.E_8_del;
+        case SCREEN_ID_E10: return &guider_ui.E_10_del;
+        case SCREEN_ID_E13: return &guider_ui.E_13_del;
+        case SCREEN_ID_E14: return &guider_ui.E_14_del;
+        case SCREEN_ID_E15: return &guider_ui.E_15_del;
+        case SCREEN_ID_E16: return &guider_ui.E_16_del;
+        case SCREEN_ID_E17: return &guider_ui.E_17_del;
         default:
-            // For the very first transition, there's no old screen.
-            // Return a pointer to a static bool that is true, so the (non-existent) old screen is marked for deletion.
             static bool first_time_del = true;
             return &first_time_del;
     }
@@ -59,27 +69,18 @@ static void switch_to_screen(screen_id_t screen_id)
         bool new_scr_del_val = false;
 
         switch (screen_id) {
-            case SCREEN_ID_SMILE:
-                new_scr = &guider_ui.smile;
-                setup_scr = setup_scr_smile;
-                new_scr_del_val = guider_ui.smile_del;
-                scr_name = "SMILE";
-                break;
-            case SCREEN_ID_SAD:
-                new_scr = &guider_ui.sad;
-                setup_scr = setup_scr_sad;
-                new_scr_del_val = guider_ui.sad_del;
-                scr_name = "SAD";
-                break;
-            case SCREEN_ID_DANGER:
-                new_scr = &guider_ui.danger;
-                setup_scr = setup_scr_danger;
-                new_scr_del_val = guider_ui.danger_del;
-                scr_name = "DANGER";
-                break;
+            case SCREEN_ID_E2: new_scr = &guider_ui.E_2; setup_scr = setup_scr_E_2; new_scr_del_val = guider_ui.E_2_del; scr_name = "E2"; break;
+            case SCREEN_ID_E5: new_scr = &guider_ui.E_5; setup_scr = setup_scr_E_5; new_scr_del_val = guider_ui.E_5_del; scr_name = "E5"; break;
+            case SCREEN_ID_E7: new_scr = &guider_ui.E_7; setup_scr = setup_scr_E_7; new_scr_del_val = guider_ui.E_7_del; scr_name = "E7"; break;
+            case SCREEN_ID_E8: new_scr = &guider_ui.E_8; setup_scr = setup_scr_E_8; new_scr_del_val = guider_ui.E_8_del; scr_name = "E8"; break;
+            case SCREEN_ID_E10: new_scr = &guider_ui.E_10; setup_scr = setup_scr_E_10; new_scr_del_val = guider_ui.E_10_del; scr_name = "E10"; break;
+            case SCREEN_ID_E13: new_scr = &guider_ui.E_13; setup_scr = setup_scr_E_13; new_scr_del_val = guider_ui.E_13_del; scr_name = "E13"; break;
+            case SCREEN_ID_E14: new_scr = &guider_ui.E_14; setup_scr = setup_scr_E_14; new_scr_del_val = guider_ui.E_14_del; scr_name = "E14"; break;
+            case SCREEN_ID_E15: new_scr = &guider_ui.E_15; setup_scr = setup_scr_E_15; new_scr_del_val = guider_ui.E_15_del; scr_name = "E15"; break;
+            case SCREEN_ID_E16: new_scr = &guider_ui.E_16; setup_scr = setup_scr_E_16; new_scr_del_val = guider_ui.E_16_del; scr_name = "E16"; break;
+            case SCREEN_ID_E17: new_scr = &guider_ui.E_17; setup_scr = setup_scr_E_17; new_scr_del_val = guider_ui.E_17_del; scr_name = "E17"; break;
             default:
                 ESP_LOGE(TAG, "Invalid screen ID: %d", screen_id);
-                // Restore memory log on failure
                 ESP_LOGI(TAG, "Memory after failed switch attempt: %zu bytes", (size_t)esp_get_free_heap_size());
                 lvgl_port_unlock();
                 return;
@@ -102,116 +103,82 @@ esp_err_t app_ui_init(void)
 {
     ESP_LOGI(TAG, "UI Application Init");
 
-    // setup_ui already handles the creation and loading of the initial screen (danger).
-    // It also calls init_scr_del_flag.
     setup_ui(&guider_ui);
-    events_init(&guider_ui); // events_init is currently empty but keep it for future use.
+    events_init(&guider_ui);
 
-    ESP_LOGI(TAG, "UI Init Finished, default screen is set by setup_ui (DANGER).");
+    g_current_screen = SCREEN_ID_E5;
+
+    ESP_LOGI(TAG, "UI Init Finished, default screen is E5.");
     ESP_LOGI(TAG, "Initial memory: %d bytes", (size_t)esp_get_free_heap_size());
-
-    // Create a timer to cycle through screens for testing
-    void ui_test_timer_cb(lv_timer_t *timer);
-    lv_timer_create(ui_test_timer_cb, 5000, NULL);
-    ESP_LOGI(TAG, "UI test timer created, will switch screens every 5 seconds.");
 
     return ESP_OK;
 }
 
 void app_ui_show_uniform_speed(int index)
 {
-    ESP_LOGI(TAG, "UI Update: Uniform Speed -> SMILE");
-    switch_to_screen(SCREEN_ID_SMILE);
-}
-
-void app_ui_show_turn_left_start(void)
-{
-    ESP_LOGI(TAG, "UI Update: Turn Left Start -> DANGER");
-    switch_to_screen(SCREEN_ID_DANGER);
-}
-
-void app_ui_show_turn_left_end(void)
-{
-    ESP_LOGI(TAG, "UI Update: Turn Left End -> SAD");
-    switch_to_screen(SCREEN_ID_SAD);
-}
-
-void app_ui_show_turn_right_start(void)
-{
-    ESP_LOGI(TAG, "UI Update: Turn Right Start -> SAD");
-    switch_to_screen(SCREEN_ID_SAD);
-}
-
-void app_ui_show_turn_right_end(void)
-{
-    ESP_LOGI(TAG, "UI Update: Turn Right End -> DANGER");
-    switch_to_screen(SCREEN_ID_DANGER);
+    ESP_LOGI(TAG, "UI Update: Uniform Speed -> E5");
+    switch_to_screen(SCREEN_ID_E5);
 }
 
 void app_ui_show_accelerate_start(void)
 {
-    // TODO: Implement UI for accelerate start
-    ESP_LOGI(TAG, "UI Update: Accelerate Start (Not Implemented)");
+    int rand_val = esp_random() % 3;
+    screen_id_t screen_to_show;
+    switch (rand_val) {
+        case 0:
+            screen_to_show = SCREEN_ID_E10;
+            ESP_LOGI(TAG, "UI Update: Accelerate Start -> E10");
+            break;
+        case 1:
+            screen_to_show = SCREEN_ID_E7;
+            ESP_LOGI(TAG, "UI Update: Accelerate Start -> E7");
+            break;
+        default:
+            screen_to_show = SCREEN_ID_E5;
+            ESP_LOGI(TAG, "UI Update: Accelerate Start -> E5");
+            break;
+    }
+    switch_to_screen(screen_to_show);
 }
 
 void app_ui_show_accelerate_end(void)
 {
-    // TODO: Implement UI for accelerate end
-    ESP_LOGI(TAG, "UI Update: Accelerate End (Not Implemented)");
+    ESP_LOGI(TAG, "UI Update: Accelerate End -> E14");
+    switch_to_screen(SCREEN_ID_E14);
 }
 
 void app_ui_show_decelerate_start(void)
 {
-    // TODO: Implement UI for brake start
-    ESP_LOGI(TAG, "UI Update: Brake Start (Not Implemented)");
+    ESP_LOGI(TAG, "UI Update: Decelerate Start -> E8");
+    switch_to_screen(SCREEN_ID_E8);
 }
 
 void app_ui_show_decelerate_end(void)
 {
-    // TODO: Implement UI for brake end
-    ESP_LOGI(TAG, "UI Update: Brake End (Not Implemented)");
+    ESP_LOGI(TAG, "UI Update: Decelerate End -> E14");
+    switch_to_screen(SCREEN_ID_E14);
 }
 
-void app_ui_show_turn_left_hard(void)
+void app_ui_show_turn_left_start(void)
 {
-    ESP_LOGI(TAG, "UI Update: Hard Turn Left -> DANGER");
-    switch_to_screen(SCREEN_ID_DANGER);
+    ESP_LOGI(TAG, "UI Update: Turn Left Start -> E13");
+    switch_to_screen(SCREEN_ID_E13);
 }
 
-void app_ui_show_turn_right_hard(void)
+void app_ui_show_turn_left_end(void)
 {
-    ESP_LOGI(TAG, "UI Update: Hard Turn Right -> SAD");
-    switch_to_screen(SCREEN_ID_SAD);
+    ESP_LOGI(TAG, "UI Update: Turn Left End -> E14");
+    switch_to_screen(SCREEN_ID_E14);
 }
 
-// Timer callback for automated UI testing
-void ui_test_timer_cb(lv_timer_t *timer)
+void app_ui_show_turn_right_start(void)
 {
-    static int next_screen_index = 0;
-    screen_id_t screens_to_cycle[] = {SCREEN_ID_SMILE, SCREEN_ID_SAD, SCREEN_ID_DANGER};
-    
-    // Log memory usage *before* the switch.
-    // At this point (5s after the last switch), the previous screen's resources should have been fully released.
-    ESP_LOGI(TAG, "[Test Timer] Memory before next switch: %zu bytes", (size_t)esp_get_free_heap_size());
+    ESP_LOGI(TAG, "UI Update: Turn Right Start -> E17");
+    switch_to_screen(SCREEN_ID_E17);
+}
 
-    screen_id_t next_screen = screens_to_cycle[next_screen_index];
-    
-    ESP_LOGI(TAG, "[Test Timer] Switching to screen index %d", next_screen_index);
-    
-    // Manually call the corresponding function to trigger the switch
-    switch(next_screen) {
-        case SCREEN_ID_SMILE:
-            app_ui_show_uniform_speed(0);
-            break;
-        case SCREEN_ID_SAD:
-            app_ui_show_turn_left_end();
-            break;
-        case SCREEN_ID_DANGER:
-            app_ui_show_turn_left_start();
-            break;
-        default:
-            break;
-    }
-
-    next_screen_index = (next_screen_index + 1) % (sizeof(screens_to_cycle) / sizeof(screen_id_t));
+void app_ui_show_turn_right_end(void)
+{
+    ESP_LOGI(TAG, "UI Update: Turn Right End -> E14");
+    switch_to_screen(SCREEN_ID_E14);
 }
